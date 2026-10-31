@@ -1,0 +1,9 @@
+sentences: 185 (prose+frontmatter 109, headings 15, table cells 61)
+not counted: code block lines 162, URL-only table cells 9 (lines [427, 428, 429, 430, 431, 432, 433, 434, 435])
+LONG>60: 0  (50<len<=60: 19)
+prose length min 8 / max 60 / short(<=20) 5 / long(41-60) 50
+SAME3: 0
+PAT 'ではありません' 149 実際のモデルの出力ではありません。
+AND/OR candidates (や in prose, judge by eye):
+  YA 298 で読みやすい文字列に直します（出
+  YA 367 英語の文はそのまま検索しやすいので

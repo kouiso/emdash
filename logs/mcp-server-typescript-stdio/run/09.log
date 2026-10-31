@@ -1,0 +1,27 @@
+date: 2026-10-31T05:14:37+00:00
+node: v22.22.0 / npm: 10.9.4
+note: logs/mcp-server-typescript-stdio/code の中身を作業フォルダ char-count-mcp にコピーし、npm install 済みの状態で、記事どおりに build と check を実行（2026-10-31 再実行）
+command: npm run build
+----- stdout+stderr -----
+
+> char-count-mcp@0.1.0 build
+> tsc
+
+----- exit=0 -----
+command: npm run check
+----- stdout+stderr -----
+
+> char-count-mcp@0.1.0 check
+> node dist/check.js
+
+char-count MCP server started (stdio)
+tools: [ 'count_chars' ]
+ok: {"content":[{"type":"text","text":"文字数: 15 / 行数: 2 / UTF-8: 50 バイト"}]}
+ng: {"content":[{"type":"text","text":"MCP error -32602: Input validation error: Invalid arguments for tool count_chars: Too small: expected string to have >=1 characters at text"}],"isError":true}
+----- exit=0 -----
+command: node compare.mjs
+----- stdout+stderr -----
+length: 8
+code points: 5
+graphemes: 1
+----- exit=0 -----

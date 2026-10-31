@@ -1,0 +1,11 @@
+date: 2026-10-31T08:54:50+00:00
+cwd: (作業フォルダ retry-mock)
+node: v22.22.0 / npm: 10.9.4
+note: 記事の準備の節。作業フォルダを作り、code/ の4ファイルを置く（書き写す代わりに cp）
+command: mkdir retry-mock && cp logs/llm-api-429-retry-sdk-mock/code/package.json logs/llm-api-429-retry-sdk-mock/code/server.ts logs/llm-api-429-retry-sdk-mock/code/client.ts logs/llm-api-429-retry-sdk-mock/code/my-loop.ts retry-mock/ && ls retry-mock
+----- stdout+stderr -----
+client.ts
+my-loop.ts
+package.json
+server.ts
+----- exit=0 -----

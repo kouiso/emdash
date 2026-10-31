@@ -1,0 +1,10 @@
+date: 2026-10-31T07:08:07+00:00
+cwd: (作業フォルダ char-count-mcp)
+node: v22.22.0 / npm: 10.9.4 / claude: 2.1.314 (Claude Code)
+note: 記事の手順2の Intl.Segmenter の比較
+command: node compare.mjs
+----- stdout+stderr -----
+length: 8
+code points: 5
+graphemes: 1
+----- exit=0 -----

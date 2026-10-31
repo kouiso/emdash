@@ -1,0 +1,420 @@
+---
+import {
+	getEmDashEntry,
+	getSeoMeta,
+	decodeSlug,
+	getSiteSettings,
+} from "emdash";
+import { Image, PortableText } from "emdash/ui";
+import Base from "../../layouts/Base.astro";
+import { courseStepForTags, formatDateJa } from "../../utils/course";
+import { resolveStarterSiteIdentity } from "../../utils/site-identity";
+import { getSiteOrigin } from "../../utils/site-origin";
+import { buildToc } from "../../utils/toc";
+
+const slug = decodeSlug(Astro.params.slug);
+
+if (!slug) {
+	return Astro.rewrite("/404");
+}
+
+const { entry: post, cacheHint } = await getEmDashEntry("posts", slug);
+
+if (!post) {
+	return Astro.rewrite("/404");
+}
+
+if (Astro.cache?.enabled) Astro.cache.set(cacheHint);
+const { siteTitle } = resolveStarterSiteIdentity(await getSiteSettings());
+const siteOrigin = getSiteOrigin(Astro.url);
+
+// SEO meta from content fields
+const seo = getSeoMeta(post, {
+	siteTitle,
+	siteUrl: siteOrigin,
+	path: Astro.url.pathname.replace(/\/$/, ""),
+});
+
+// Taxonomy terms are already hydrated onto the entry by getEmDashEntry.
+const tags = post.data.terms?.tag ?? [];
+const course = courseStepForTags(tags);
+const crumbTag = (course && tags.find((t) => t.slug === course.step.slug)) ?? tags[0];
+const toc = buildToc(post.data.content);
+const { publishedAt, updatedAt } = post.data;
+const showUpdated =
+	publishedAt && formatDateJa(updatedAt) !== formatDateJa(publishedAt);
+// 料金の目安・動かした環境・動作確認日は任意のフィールド。空白だけの値は未入力として扱い、出さない
+const costEstimate = post.data.cost_estimate?.trim() || null;
+const runEnvironment = post.data.run_environment?.trim() || null;
+const verifiedAt = post.data.verified_at?.trim() || null;
+const verifiedAtLabel = verifiedAt ? formatIsoDateJa(verifiedAt) : null;
+
+/** 動作確認日は時刻を持たない暦日（YYYY-MM-DD の文字列）。実在しない日付なら null を返し、入力をそのまま出す */
+function formatIsoDateJa(value: string): string | null {
+	const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value);
+	if (!m) return null;
+	const [year, month, day] = [Number(m[1]), Number(m[2]), Number(m[3])];
+	// Date.UTC は 0〜99 年を 1900 年代に読み替えるので、setUTCFullYear で年をそのまま入れる
+	const date = new Date(0);
+	date.setUTCFullYear(year, month - 1, day);
+	if (date.getUTCFullYear() !== year || date.getUTCMonth() !== month - 1 || date.getUTCDate() !== day) return null;
+	return `${year}年${month}月${day}日`;
+}
+// SEO パネルにも記事にも画像が無いときは、タイトルから作る OGP 画像を使う
+const ogImage =
+	seo.ogImage ?? new URL(`/og/posts/${encodeURIComponent(slug)}.svg`, siteOrigin).href;
+const articleMeta = {
+	publishedTime: publishedAt ? publishedAt.toISOString() : null,
+	modifiedTime: updatedAt.toISOString(),
+	author: post.data.byline?.displayName ?? null,
+};
+---
+
+<Base
+	title={seo.title}
+	pageTitle={seo.ogTitle}
+	description={seo.description}
+	canonical={seo.canonical}
+	image={ogImage}
+	pageType="article"
+	articleMeta={articleMeta}
+	content={{ collection: "posts", id: post.data.id, slug }}
+>
+	<div class="container article-layout">
+		<article class="card article">
+			<nav class="breadcrumb" aria-label="パンくず">
+				<a href="/">トップ</a>{" / "}
+				{crumbTag ? <a href={`/tag/${crumbTag.slug}`}>{crumbTag.label}</a> : <a href="/posts">記事一覧</a>}
+				{" / 記事"}
+			</nav>
+			{course && <p class="eyebrow article__eyebrow">入門ステップ講座 {course.step.no} / {course.step.name}</p>}
+			<h1 class="article__title" {...post.edit.title}>{post.data.title}</h1>
+			{
+				(publishedAt || verifiedAt) && (
+					<p class="article__meta">
+						{publishedAt && (
+							<>
+								公開 <time datetime={publishedAt.toISOString()}>{formatDateJa(publishedAt)}</time>
+							</>
+						)}
+						{publishedAt && showUpdated && (
+							<>
+								{" ・ 更新 "}
+								<time datetime={updatedAt.toISOString()}>{formatDateJa(updatedAt)}</time>
+							</>
+						)}
+						{verifiedAt && (
+							<span class="article__verified" data-verified-at>
+								{publishedAt ? " ・ " : ""}動作確認日{" "}
+								<time datetime={verifiedAtLabel ? verifiedAt : undefined}>{verifiedAtLabel ?? verifiedAt}</time>
+							</span>
+						)}
+					</p>
+				)
+			}
+
+			{
+				(costEstimate || runEnvironment) && (
+					<dl class="cost-box" data-cost-box>
+						{costEstimate && (
+							<div class="cost-box__row">
+								<dt>料金の目安</dt>
+								<dd>{costEstimate}</dd>
+							</div>
+						)}
+						{runEnvironment && (
+							<div class="cost-box__row">
+								<dt>動かした環境</dt>
+								<dd>{runEnvironment}</dd>
+							</div>
+						)}
+					</dl>
+				)
+			}
+
+			{
+				post.data.featured_image && (
+					<div class="article__image" {...post.edit.featured_image}>
+						<Image image={post.data.featured_image} />
+					</div>
+				)
+			}
+
+			<div class="prose" data-prose>
+				<PortableText value={post.data.content} />
+			</div>
+
+			{
+				tags.length > 0 && (
+					<nav class="chips" aria-label="この記事のタグ">
+						{tags.map((t) => (
+							<a class="chip" href={`/tag/${t.slug}`}>{t.label}</a>
+						))}
+					</nav>
+				)
+			}
+
+			{
+				course && (course.prev || course.next) && (
+					<nav class="step-nav" aria-label="講座の前後">
+						{course.prev ? (
+							<a href={`/tag/${course.prev.slug}`}>
+								<span class="label">前のステップ</span>
+								{course.prev.no} {course.prev.name}
+							</a>
+						) : (
+							<span />
+						)}
+						{course.next && (
+							<a class="is-next" href={`/tag/${course.next.slug}`}>
+								<span class="label">次のステップ</span>
+								{course.next.no} {course.next.name}
+							</a>
+						)}
+					</nav>
+				)
+			}
+
+			<p class="article__ai-note">この記事は AI 支援で執筆しました。</p>
+		</article>
+
+		<aside class="article-aside">
+			{
+				toc.length > 0 && (
+					<nav class="card toc" aria-label="目次" data-toc>
+						<p class="toc__title">目次</p>
+						<ol class="toc__list">
+							{toc.map((item) => (
+								<li>
+									<a href={`#${item.id}`}>{item.text}</a>
+								</li>
+							))}
+						</ol>
+					</nav>
+				)
+			}
+			<div class="gift-box">
+				<p class="gift-box__title">動くサンプルアプリを受け取る</p>
+				<p class="gift-box__text">RAG チャットと自作 MCP サーバー</p>
+				<a class="btn btn--warm" href="/#gift">特典を見る</a>
+			</div>
+		</aside>
+	</div>
+</Base>
+
+<script is:inline>
+	// 目次（src/utils/toc.ts の buildToc）と同じ数え方で本文の h2 に id を振る。
+	// buildToc は文字の無い h2 を飛ばすので、ここでも飛ばす。h2 に id が既にあるときは書き換えず、
+	// 目次のリンク先をその id に合わせる
+	(function () {
+		var headings = document.querySelectorAll("[data-prose] h2");
+		var n = 0;
+		for (var i = 0; i < headings.length; i++) {
+			if (!headings[i].textContent || !headings[i].textContent.trim()) continue;
+			n++;
+			var expected = "sec-" + n;
+			if (!headings[i].id) {
+				headings[i].id = expected;
+			} else if (headings[i].id !== expected) {
+				var link = document.querySelector('[data-toc] a[href="#' + expected + '"]');
+				if (link) link.setAttribute("href", "#" + headings[i].id);
+			}
+		}
+	})();
+</script>
+
+<style>
+	.article-layout {
+		padding-top: clamp(24px, 6vw, 40px);
+		padding-bottom: clamp(48px, 9vw, 72px);
+		display: flex;
+		flex-wrap: wrap;
+		gap: 40px;
+		align-items: flex-start;
+	}
+	.article {
+		flex: 999 1 560px;
+		min-width: 0;
+		padding: clamp(20px, 5vw, 40px);
+		display: flex;
+		flex-direction: column;
+		gap: 20px;
+	}
+	.article__eyebrow {
+		font-size: 13px;
+	}
+	.article__title {
+		margin: 0;
+		font-size: clamp(24px, 5.4vw, 32px);
+		line-height: 1.45;
+	}
+	.article__meta {
+		margin: 0;
+		font-size: 13px;
+		color: var(--muted);
+	}
+	.cost-box {
+		margin: 0;
+		padding: 16px 20px;
+		background: var(--accent-soft);
+		border-radius: 8px;
+		display: flex;
+		flex-direction: column;
+		gap: 8px;
+		font-size: 14px;
+		line-height: 1.7;
+	}
+	.cost-box__row {
+		display: flex;
+		flex-wrap: wrap;
+		column-gap: 16px;
+	}
+	.cost-box dt {
+		flex: 0 0 7em;
+		font-weight: 700;
+	}
+	.cost-box dd {
+		flex: 1 1 16em;
+		margin: 0;
+		min-width: 0;
+		overflow-wrap: anywhere;
+	}
+	.article__image :global(img) {
+		display: block;
+		border-radius: 8px;
+	}
+	.article__ai-note {
+		margin: 0;
+		font-size: 13px;
+		color: var(--muted);
+	}
+	.article-aside {
+		flex: 1 1 280px;
+		min-width: 0;
+		display: flex;
+		flex-direction: column;
+		gap: 16px;
+	}
+	@media (min-width: 900px) {
+		.article-aside {
+			position: sticky;
+			top: 24px;
+		}
+	}
+	.toc {
+		padding: 20px;
+	}
+	.toc__title {
+		margin: 0 0 8px;
+		font-weight: 700;
+	}
+	.toc__list {
+		margin: 0;
+		padding-left: 20px;
+		line-height: 2;
+		font-size: 14px;
+	}
+	.gift-box {
+		background: var(--warm-soft);
+		border-radius: 12px;
+		padding: 20px;
+		display: flex;
+		flex-direction: column;
+		gap: 10px;
+	}
+	.gift-box__title {
+		margin: 0;
+		font-weight: 700;
+	}
+	.gift-box__text {
+		margin: 0;
+		font-size: 14px;
+		line-height: 1.7;
+	}
+
+	/* Portable Text の本文。デザインの見出し・コード・出典の見た目に合わせる */
+	.prose {
+		line-height: 1.9;
+		overflow-wrap: anywhere;
+	}
+	.prose :global(> * + *) {
+		margin-top: 20px;
+	}
+	.prose :global(p) {
+		margin-bottom: 0;
+	}
+	.prose :global(> :first-child) {
+		margin-top: 0;
+	}
+	.prose :global(h2) {
+		margin: 32px 0 0;
+		font-size: clamp(20px, 4.4vw, 24px);
+		line-height: 1.5;
+		scroll-margin-top: 16px;
+	}
+	.prose :global(h3) {
+		margin: 28px 0 0;
+		font-size: 19px;
+		line-height: 1.5;
+	}
+	.prose :global(h4) {
+		margin: 24px 0 0;
+		font-size: 17px;
+	}
+	.prose :global(ul),
+	.prose :global(ol) {
+		padding-left: 24px;
+		margin-bottom: 0;
+	}
+	.prose :global(li + li) {
+		margin-top: 4px;
+	}
+	.prose :global(pre) {
+		margin-bottom: 0;
+		background: var(--code-bg);
+		color: var(--code-fg);
+		padding: 20px;
+		border-radius: 8px;
+		overflow-x: auto;
+		overflow-wrap: normal;
+		font-family: var(--font-mono);
+		font-size: 14px;
+		line-height: 1.7;
+	}
+	.prose :global(code) {
+		font-family: var(--font-mono);
+		font-size: 0.9em;
+		background: var(--output-bg);
+		padding: 0.1em 0.35em;
+		border-radius: 4px;
+	}
+	.prose :global(pre code) {
+		background: none;
+		padding: 0;
+		font-size: inherit;
+		color: inherit;
+	}
+	.prose :global(blockquote) {
+		margin-left: 0;
+		margin-right: 0;
+		margin-bottom: 0;
+		padding: 14px 16px;
+		background: var(--accent-soft);
+		border-radius: 8px;
+	}
+	.prose :global(table) {
+		display: block;
+		overflow-x: auto;
+		border-collapse: collapse;
+		font-size: 14px;
+	}
+	.prose :global(th),
+	.prose :global(td) {
+		border: 1px solid var(--line);
+		padding: 8px 12px;
+		text-align: left;
+	}
+	.prose :global(img) {
+		border-radius: 8px;
+	}
+</style>

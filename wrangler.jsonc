@@ -1,0 +1,44 @@
+{
+	"$schema": "node_modules/wrangler/config-schema.json",
+	"name": "ai-eng-blog",
+	"main": "./src/worker.ts",
+	"compatibility_date": "2026-10-25",
+	"compatibility_flags": ["nodejs_compat"],
+	"d1_databases": [
+		{
+			"binding": "DB",
+			"database_name": "emdash-trial-20261021-db",
+			"database_id": "a4b9eeef-6a0e-4fb5-9261-bb58a4286214",
+		},
+	],
+	"r2_buckets": [
+		{
+			"binding": "MEDIA",
+			"bucket_name": "emdash-trial-20261021-media",
+		},
+	],
+	"workers_dev": true,
+	// Version URL（旧称 Preview URL）を切る。有効だと deploy や Workers Builds のプレビューのたびに
+	// 公開の URL ができ、本番と同じ D1 につながる。セットアップ前の本番 D1 に、そこから最初の管理者を
+	// 作られないようにする。省略すると wrangler は今の設定を変えないので、明示する
+	// （https://developers.cloudflare.com/workers/configuration/previews/ 2026-10-31 確認）
+	"preview_urls": false,
+	// ここに書いた vars は wrangler deploy のたびにダッシュボードの変数を上書きする（keep_vars は使わない）。
+	// 公開してよい値はここに書き、秘密の値（TURNSTILE_SECRET_KEY）だけをダッシュボードの secret にする。
+	// secret は deploy で消えない（https://developers.cloudflare.com/workers/wrangler/configuration/ 2026-10-31 確認）
+	"vars": {
+		// 本番の公開 URL。Worker 名 ai-eng-blog とアカウントのサブドメイン kouiso から決まる（持ち主が
+		// ダッシュボードで確かめた値）。パスキーはこの URL に結び付くので、最初の管理者を作ったあとは変えない。
+		// ローカルでは npx wrangler dev --local --var EMDASH_SITE_URL:http://localhost:8787 で上書きする。
+		// 理由と手順は docs/decisions/site-url.md
+		"EMDASH_SITE_URL": "https://ai-eng-blog.kouiso.workers.dev",
+	},
+	"kv_namespaces": [
+		{ "binding": "SESSION", "id": "12fbffdd4ec5416999785817007ee354" }
+	],
+	"observability": { "enabled": true, "head_sampling_rate": 1 },
+	// General maintenance cron trigger
+	"triggers": {
+		"crons": ["* * * * *"],
+	},
+}

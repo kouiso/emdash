@@ -1,0 +1,8 @@
+date: 2026-10-31 09:26:48 +0000
+cwd: /path/to/bm25-search
+node: v22.22.0
+icu: 77.1
+command: cp ../code/package.json .
+exit: 0
+--- stdout+stderr ---
+

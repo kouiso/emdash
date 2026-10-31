@@ -1,0 +1,8 @@
+sentences: 188 (prose+frontmatter 130, headings 11, table cells 47)
+not counted: code block lines 154, URL-only table cells 9 (lines [418, 419, 420, 421, 422, 423, 424, 425, 426])
+LONG>60: 0  (50<len<=60: 21)
+prose length min 9 / max 60 / short(<=20) 10 / long(41-60) 51
+SAME3: 0
+AND/OR candidates (や in prose, judge by eye):
+  YA 159 依存を増やさないためにこの記事では
+  YA 410 長い日本語の文書を検索しやすい大きさに分けます

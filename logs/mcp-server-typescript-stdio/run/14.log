@@ -1,0 +1,21 @@
+date: 2026-10-31T07:08:06+00:00
+cwd: (作業フォルダ char-count-mcp)
+node: v22.22.0 / npm: 10.9.4 / claude: 2.1.314 (Claude Code)
+note: 記事の手順3。ビルドして check を実行
+command: npm run build
+----- stdout+stderr -----
+
+> char-count-mcp@0.1.0 build
+> tsc
+----- exit=0 -----
+command: npm run check
+----- stdout+stderr -----
+
+> char-count-mcp@0.1.0 check
+> node dist/check.js
+
+char-count MCP server started (stdio)
+tools: [ 'count_chars' ]
+ok: {"content":[{"type":"text","text":"文字数: 15 / 行数: 2 / UTF-8: 50 バイト"}]}
+ng: {"content":[{"type":"text","text":"MCP error -32602: Input validation error: Invalid arguments for tool count_chars: Too small: expected string to have >=1 characters at text"}],"isError":true}
+----- exit=0 -----

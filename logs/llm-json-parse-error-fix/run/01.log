@@ -1,0 +1,7 @@
+date: 2026-10-31T09:27:44Z
+cwd: <work>/work
+node: v22.22.0 / npm: 10.9.4
+command: node -v
+--- output (stdout+stderr) ---
+v22.22.0
+--- exit=0

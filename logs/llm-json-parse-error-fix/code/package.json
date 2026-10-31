@@ -1,0 +1,5 @@
+{
+  "name": "llm-json-parse",
+  "private": true,
+  "type": "module"
+}

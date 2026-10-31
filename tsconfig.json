@@ -1,0 +1,7 @@
+{
+	"extends": "astro/tsconfigs/base",
+	"compilerOptions": {
+		"types": ["node"]
+	},
+	"include": ["src", "test", "vitest.config.ts", ".astro/types.d.ts", "emdash-env.d.ts", "worker-configuration.d.ts"]
+}

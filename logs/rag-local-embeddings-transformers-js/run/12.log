@@ -1,0 +1,16 @@
+date: 2026-10-31 13:52:01 +0000
+cwd: /path/to/local-embeddings
+node: v22.22.0
+npm: 10.9.4
+command: node search.ts 宿題を手伝って 8
+exit: 0
+elapsed: 2886 ms
+--- stdout+stderr ---
+0.797 shipping-fee
+0.793 points
+0.792 login
+0.790 payment
+0.785 returns
+0.785 delivery
+0.780 password
+0.779 cancel

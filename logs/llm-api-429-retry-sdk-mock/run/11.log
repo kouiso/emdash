@@ -1,0 +1,44 @@
+date: 2026-10-31T08:55:45+00:00
+cwd: (作業フォルダ retry-mock)
+node: v22.22.0 / npm: 10.9.4
+note: extra/netns-all.sh（記事には載せない）。ループバックだけのネットワーク名前空間で全シナリオを実行し、外へ出られないことを確かめる
+command: unshare -rn sh logs/llm-api-429-retry-sdk-mock/code/extra/netns-all.sh logs/llm-api-429-retry-sdk-mock/code/extra/lo-up.py
+----- stdout+stderr -----
+lo up
+mock API: http://127.0.0.1:4010
+$ node client.ts rate-limit
+rate-limit #1 +0ms -> 429
+rate-limit #2 +1011ms -> 429
+rate-limit #3 +2018ms -> 200
+ok (2090ms): { type: 'text', text: 'mock: ok' }
+$ node client.ts overloaded
+overloaded #1 +0ms -> 529
+overloaded #2 +423ms -> 529
+overloaded #3 +1350ms -> 529
+InternalServerError (1399ms): status=529 type=overloaded_error
+$ node client.ts bad-request
+bad-request #1 +0ms -> 400
+BadRequestError (81ms): status=400 type=invalid_request_error
+$ node client.ts spend-cap
+spend-cap #1 +0ms -> 429
+spend-cap #2 +395ms -> 429
+spend-cap #3 +1259ms -> 429
+spend cap (1312ms): 来月まで待つか上限を上げる
+$ node client.ts long-wait
+long-wait #1 +0ms -> 429
+APIUserAbortError (10005ms): status=undefined type=null
+$ node my-loop.ts
+my-loop #1 +0ms -> 529
+my-loop #2 +498ms -> 529
+my-loop #3 +1341ms -> 529
+attempt 1 failed: 529 {"type":"error","error":{"type":"overloaded_error","message":"mock: overloaded"},"request_id":"req_mock"}
+my-loop #4 +2350ms -> 529
+my-loop #5 +2794ms -> 529
+my-loop #6 +3672ms -> 529
+attempt 2 failed: 529 {"type":"error","error":{"type":"overloaded_error","message":"mock: overloaded"},"request_id":"req_mock"}
+my-loop #7 +4677ms -> 529
+my-loop #8 +5169ms -> 529
+my-loop #9 +6160ms -> 529
+attempt 3 failed: 529 {"type":"error","error":{"type":"overloaded_error","message":"mock: overloaded"},"request_id":"req_mock"}
+external fetch failed: ENETUNREACH
+----- exit=0 -----

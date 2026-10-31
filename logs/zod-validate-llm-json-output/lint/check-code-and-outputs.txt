@@ -1,0 +1,41 @@
+code package.json: True
+code schema.ts: True
+code samples.ts: True
+code check.ts: True
+code retry-message.ts: True
+code pretty-ja.ts: True
+code strip.ts: True
+command 'mkdir zod-llm-check': True
+command 'npm install': True
+command 'node check.ts ok': True
+command 'node check.ts wrong-type': True
+command 'node check.ts bad-enum': True
+command 'node check.ts extra-key': True
+command 'node check.ts many': True
+command 'node retry-message.ts': True
+command 'node pretty-ja.ts': True
+command 'node strip.ts': True
+output run/03.log (npm install): True
+output run/05.log (node check.ts ok): True
+output run/06.log (node check.ts wrong-type): True
+output run/07.log (node check.ts bad-enum): True
+output run/08.log (node check.ts extra-key): True
+output run/09.log (node check.ts many): True
+output run/10.log (cp (code)/retry-message.ts . && node retry-message.ts): True
+output run/11.log (cp (code)/pretty-ja.ts . && node pretty-ja.ts): True
+output run/12.log (cp (code)/strip.ts . && node strip.ts): True
+run 01 exit=0
+run 02 exit=0
+run 03 exit=0
+run 04 exit=0
+run 05 exit=0
+run 06 exit=0
+run 07 exit=0
+run 08 exit=0
+run 09 exit=0
+run 10 exit=0
+run 11 exit=0
+run 12 exit=0
+run 13 exit=0
+run 14 exit=0
+ALL OK

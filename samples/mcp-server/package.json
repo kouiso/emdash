@@ -1,0 +1,29 @@
+{
+  "name": "mcp-notes-server-sample",
+  "version": "0.1.0",
+  "private": true,
+  "description": "ローカルフォルダのメモを検索・追加する最小構成の MCP サーバー (stdio)",
+  "type": "module",
+  "bin": {
+    "mcp-notes-server": "dist/index.js"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.check.json",
+    "test": "node --import tsx --test test/*.test.ts",
+    "e2e": "npm run build && node --import tsx scripts/e2e.ts",
+    "start": "node dist/index.js"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "1.32.2",
+    "zod": "4.6.7"
+  },
+  "devDependencies": {
+    "@types/node": "22.20.5",
+    "tsx": "4.23.15",
+    "typescript": "7.0.2"
+  }
+}

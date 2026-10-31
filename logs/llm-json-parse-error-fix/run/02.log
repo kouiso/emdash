@@ -1,0 +1,10 @@
+date: 2026-10-31T09:27:44Z
+cwd: <work>/llm-json-parse
+node: v22.22.0 / npm: 10.9.4
+command: node reproduce.ts
+--- output (stdout+stderr) ---
+fenced: SyntaxError: Unexpected token '`'
+preamble: SyntaxError: Unexpected token '分'
+trailing: SyntaxError: Unexpected non-whitespace character after JSON at position 39 (line 2 column 1)
+truncated: SyntaxError: Unterminated string in JSON at position 43 (line 1 column 44)
+--- exit=0

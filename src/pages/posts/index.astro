@@ -1,0 +1,142 @@
+---
+import { getEmDashCollection, getTermsForEntries } from "emdash";
+import { Image } from "emdash/ui";
+import Base from "../../layouts/Base.astro";
+import { COURSE_STEPS, courseStepForTags, formatDateJa } from "../../utils/course";
+
+const cursor = Astro.url.searchParams.get("cursor") || undefined;
+const {
+	entries: posts,
+	cacheHint,
+	nextCursor,
+} = await getEmDashCollection("posts", {
+	orderBy: { published_at: "desc" },
+	limit: 20,
+	cursor,
+});
+if (Astro.cache?.enabled) Astro.cache.set(cacheHint);
+
+// Single batched query for tags across every post, instead of calling
+// getEntryTerms() per post (which would be N round-trips).
+const tagsByEntry = await getTermsForEntries(
+	"posts",
+	posts.map((p) => p.data.id),
+	"tag",
+);
+const postsWithTags = posts.map((post) => {
+	const tags = tagsByEntry.get(post.data.id) ?? [];
+	return { post, tags, course: courseStepForTags(tags) };
+});
+---
+
+<Base title="記事一覧" description="ai-eng-blog の記事一覧です。入門ステップ講座のキーワードで絞り込めます。">
+	<div class="container listing">
+		<h1 class="page-title">記事一覧</h1>
+		<nav class="chips" aria-label="タグで絞り込む">
+			<a class="chip" href="/posts" aria-current="page">すべて</a>
+			{COURSE_STEPS.map((s) => <a class="chip" href={`/tag/${s.slug}`}>{s.name}</a>)}
+		</nav>
+
+		{
+			postsWithTags.length === 0 ? (
+				<p class="empty">まだ記事がありません。</p>
+			) : (
+				<ul class="post-grid">
+					{postsWithTags.map(({ post, tags, course }) => (
+						<li class="card post-card">
+							{post.data.featured_image && (
+								<div class="post-card__image" {...post.edit.featured_image}>
+									<Image image={post.data.featured_image} />
+								</div>
+							)}
+							{course ? (
+								<span class="post-card__step mono">
+									講座 {course.step.no} / {course.step.name}
+								</span>
+							) : (
+								tags[0] && <span class="post-card__step mono">{tags[0].label}</span>
+							)}
+							<a class="post-card__title" href={`/posts/${post.id}`} {...post.edit.title}>
+								{post.data.title}
+							</a>
+							{post.data.excerpt && (
+								<span class="post-card__excerpt" {...post.edit.excerpt}>
+									{post.data.excerpt}
+								</span>
+							)}
+							{post.data.publishedAt && (
+								<time class="post-card__meta" datetime={post.data.publishedAt.toISOString()}>
+									{formatDateJa(post.data.publishedAt)}
+								</time>
+							)}
+						</li>
+					))}
+				</ul>
+			)
+		}
+
+		{
+			(cursor || nextCursor) && (
+				<nav class="pager" aria-label="ページ送り">
+					{cursor && <a href="/posts">最初のページ</a>}
+					{nextCursor && (
+						<a href={`/posts?cursor=${encodeURIComponent(nextCursor)}`}>次へ</a>
+					)}
+				</nav>
+			)
+		}
+	</div>
+</Base>
+
+<style>
+	.listing {
+		padding-top: clamp(32px, 7vw, 48px);
+		padding-bottom: clamp(48px, 9vw, 72px);
+		display: flex;
+		flex-direction: column;
+		gap: 24px;
+	}
+	.post-grid {
+		margin: 0;
+		padding: 0;
+		list-style: none;
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr));
+		gap: 16px;
+	}
+	.post-card {
+		padding: 20px;
+		display: flex;
+		flex-direction: column;
+		gap: 10px;
+		min-width: 0;
+	}
+	.post-card__image :global(img) {
+		display: block;
+		border-radius: 8px;
+	}
+	.post-card__step {
+		font-size: 13px;
+		color: var(--accent);
+	}
+	.post-card__title {
+		font-weight: 700;
+		font-size: 18px;
+		line-height: 1.5;
+		color: var(--text);
+		text-decoration: none;
+	}
+	.post-card__title:hover {
+		color: var(--accent);
+		text-decoration: underline;
+	}
+	.post-card__excerpt {
+		color: var(--text-2);
+		line-height: 1.7;
+		font-size: 15px;
+	}
+	.post-card__meta {
+		font-size: 13px;
+		color: var(--muted);
+	}
+</style>

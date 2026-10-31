@@ -1,0 +1,15 @@
+date: 2026-10-31 09:10:44 +0000
+cwd: /path/to/zod-tool-schema
+node: v22.22.0
+npm: 10.9.4
+command: npm run typecheck
+exit: 1
+--- stdout+stderr ---
+
+> zod-tool-schema@0.1.0 typecheck
+> tsc
+
+src/tool.ts(10,3): error TS2322: Type 'ZodStandardJSONSchemaPayload<ZodType<unknown, unknown, $ZodTypeInternals<unknown, unknown>>>' is not assignable to type 'InputSchema'.
+  Types of property 'type' are incompatible.
+    Type 'SchemaType[] | SchemaType | undefined' is not assignable to type '"object"'.
+      Type 'undefined' is not assignable to type '"object"'.

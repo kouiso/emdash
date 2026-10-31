@@ -1,0 +1,10 @@
+date: 2026-10-31T09:27:45Z
+cwd: <work>/llm-json-parse
+node: v22.22.0 / npm: 10.9.4
+command: node fix.ts
+--- output (stdout+stderr) ---
+fenced: { category: 'billing', priority: 1 }
+preamble: { category: 'billing', priority: 1 }
+trailing: { category: 'billing', priority: 1 }
+truncated: SyntaxError: Unterminated string in JSON at position 43 (line 1 column 44)
+--- exit=0

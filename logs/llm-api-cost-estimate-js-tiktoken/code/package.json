@@ -1,0 +1,9 @@
+{
+  "name": "token-cost-estimate",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "js-tiktoken": "1.0.21"
+  }
+}

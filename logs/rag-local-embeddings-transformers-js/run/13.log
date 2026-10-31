@@ -1,0 +1,9 @@
+date: 2026-10-31 13:52:09 +0000
+cwd: /path/to/w
+node: v22.22.0
+npm: 10.9.4
+command: bash -c mkdir local-embeddings-skip && cp code/package.json code/embed.ts code/show-vector.ts code/docs.ts code/vector-search.ts code/search.ts local-embeddings-skip/
+exit: 0
+elapsed: 10 ms
+--- stdout+stderr ---
+

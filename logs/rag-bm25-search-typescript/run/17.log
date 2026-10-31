@@ -1,0 +1,27 @@
+date: 2026-10-31 09:27:16 +0000
+cwd: /path/to/bm25-search
+node: v22.22.0
+icu: 77.1
+command: unshare -rn ./offline-all.sh
+exit: 0
+--- stdout+stderr ---
+## node show-tokens.ts 支払いにＰａｙＰａｙが使えます。
+exit=0
+## node show-tokens.ts 使える支払い方法
+exit=0
+## node search.ts 返品できる期間は？
+exit=0
+## node search.ts 使える支払い方法
+exit=0
+## node search.ts 返金はいつ？
+exit=0
+## node search.ts 返品
+exit=0
+## node search.ts 返品 0
+exit=0
+## node context.ts 返品できる期間は？
+exit=0
+## node context.ts 返金はいつ？
+exit=0
+## outbound fetch
+EAI_AGAIN

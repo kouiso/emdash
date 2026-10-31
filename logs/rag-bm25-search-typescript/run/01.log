@@ -1,0 +1,8 @@
+date: 2026-10-31 09:26:48 +0000
+cwd: /path/to/run1
+node: v22.22.0
+icu: 77.1
+command: mkdir bm25-search
+exit: 0
+--- stdout+stderr ---
+

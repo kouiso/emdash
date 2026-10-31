@@ -1,0 +1,10 @@
+date: 2026-10-31T04:47:13+00:00
+cwd: (作業フォルダ char-count-mcp)
+node: v22.22.0 / npm: 10.9.4
+command: npm run build
+----- stdout+stderr -----
+
+> char-count-mcp@0.1.0 build
+> tsc
+
+----- exit=0 -----

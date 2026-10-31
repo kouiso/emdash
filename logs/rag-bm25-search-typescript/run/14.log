@@ -1,0 +1,13 @@
+date: 2026-10-31 09:26:50 +0000
+cwd: /path/to/bm25-search
+node: v22.22.0
+icu: 77.1
+command: node context.ts 返金はいつ？
+exit: 0
+--- stdout+stderr ---
+次の資料だけを使って質問に答えてください。
+資料に答えが無いときは「わかりません」と答えてください。
+
+
+
+質問: 返金はいつ？

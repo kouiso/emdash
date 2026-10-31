@@ -1,0 +1,9 @@
+date: 2026-10-31T04:47:15+00:00
+cwd: (作業フォルダ char-count-mcp)
+node: v22.22.0 / npm: 10.9.4
+command: node compare.mjs
+----- stdout+stderr -----
+length: 8
+code points: 5
+graphemes: 1
+----- exit=0 -----

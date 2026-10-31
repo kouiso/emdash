@@ -1,0 +1,6 @@
+sentences: 207 (prose+frontmatter 144, headings 11, table cells 52)
+not counted: code block lines 94, URL-only table cells 12 (lines [313, 314, 315, 316, 317, 318, 319, 320, 321, 322, 323, 324])
+LONG>60: 0  (50<len<=60: 19)
+prose length min 8 / max 60 / short(<=20) 7 / long(41-60) 63
+SAME3: 0
+AND/OR candidates (や in prose, judge by eye):

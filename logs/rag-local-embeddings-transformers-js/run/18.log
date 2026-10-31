@@ -1,0 +1,12 @@
+date: 2026-10-31 13:52:37 +0000
+cwd: /path/to/local-embeddings
+node: v22.22.0
+npm: 10.9.4
+command: find node_modules/@huggingface/transformers/.cache -type f -printf %s %P\n
+exit: 0
+elapsed: 6 ms
+--- stdout+stderr ---
+17082730 Xenova/multilingual-e5-small/tokenizer.json
+443 Xenova/multilingual-e5-small/tokenizer_config.json
+118308185 Xenova/multilingual-e5-small/onnx/model_quantized.onnx
+658 Xenova/multilingual-e5-small/config.json

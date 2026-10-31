@@ -1,0 +1,13 @@
+date: 2026-10-31 13:51:03 +0000
+cwd: /path/to/jp-chunker
+node: v22.22.0
+icu: 77.1
+command: bash -c node main.ts doc.md 40 0 | head -n 6
+exit: 0
+--- stdout+stderr ---
+--- #1 (40字)
+ご利用ガイド > 返品について > 返品できる条件
+商品到着後8日以内に、マイペ
+--- #2 (40字)
+ご利用ガイド > 返品について > 返品できる条件
+ージから返品を申し込めます。

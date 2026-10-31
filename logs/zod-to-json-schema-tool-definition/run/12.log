@@ -1,0 +1,8 @@
+date: 2026-10-31 09:19:07 +0000
+cwd: /path/to/zod-tool-schema
+node: v22.22.0
+npm: 10.9.4
+command: npx tsc -v
+exit: 0
+--- stdout+stderr ---
+Version 7.0.2

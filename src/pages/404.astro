@@ -1,0 +1,24 @@
+---
+import Base from "../layouts/Base.astro";
+---
+
+<Base title="ページが見つかりません" noindex>
+	<div class="container simple-page">
+		<h1 class="page-title">ページが見つかりません</h1>
+		<p class="lead">お探しのページは移動したか、削除された可能性があります。</p>
+		<p><a href="/">トップへ戻る</a> ・ <a href="/posts">記事一覧を見る</a></p>
+	</div>
+</Base>
+
+<style>
+	.simple-page {
+		padding-top: clamp(32px, 7vw, 48px);
+		padding-bottom: clamp(48px, 9vw, 72px);
+		display: flex;
+		flex-direction: column;
+		gap: 16px;
+	}
+	.simple-page p {
+		margin: 0;
+	}
+</style>

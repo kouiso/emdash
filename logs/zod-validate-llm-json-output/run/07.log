@@ -1,0 +1,15 @@
+date: 2026-10-31T09:12:08+00:00
+cwd: (作業フォルダ zod-llm-check)
+node: v22.22.0 / npm: 10.9.4
+note: 見本 bad-enum
+command: node check.ts bad-enum
+----- stdout+stderr -----
+[
+  {
+    code: 'invalid_value',
+    values: [ 'bug', 'billing', 'other' ],
+    path: [ 'category' ],
+    message: 'Invalid option: expected one of "bug"|"billing"|"other"'
+  }
+]
+----- exit=0 -----

@@ -1,0 +1,7 @@
+date: 2026-10-31T08:56:18+00:00
+cwd: (型チェック用の別フォルダ。記事の4ファイルと extra/tsconfig.typecheck.json を tsconfig.json として置いた)
+node: v22.22.0 / npm: 10.9.4 / tsc: Version 7.0.2
+note: 記事には載せない確認。Node.js の型ストリップは型を調べないので、TypeScript 7.0.2 と @types/node 22.20.5 を --no-save で入れて tsc で型を調べた
+command: npx tsc -p .
+----- stdout+stderr -----
+----- exit=0 -----

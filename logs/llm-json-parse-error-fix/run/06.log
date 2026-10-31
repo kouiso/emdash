@@ -1,0 +1,12 @@
+date: 2026-10-31T09:27:45Z
+cwd: <work>/llm-json-parse
+node: v22.22.0 / npm: 10.9.4
+command: node <code>/extra/full-messages.ts
+--- output (stdout+stderr) ---
+fenced: "SyntaxError: Unexpected token '`', \"```json\n{\"\"... is not valid JSON"
+preamble: "SyntaxError: Unexpected token '分', \"分類結果は次のとおり\"... is not valid JSON"
+trailing: "SyntaxError: Unexpected non-whitespace character after JSON at position 39 (line 2 column 1)"
+truncated: "SyntaxError: Unterminated string in JSON at position 43 (line 1 column 44)"
+trailing の「以」の位置: 39
+truncated の長さ: 43
+--- exit=0

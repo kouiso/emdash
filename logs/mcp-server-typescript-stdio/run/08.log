@@ -1,0 +1,21 @@
+date: 2026-10-31T04:52:20+00:00
+cwd: (作業フォルダ char-count-mcp)
+node: v22.22.0 / npm: 10.9.4
+command: grep -n 'console\.\|onerror' src/server.ts src/check.ts; npm run build && timeout 20 npm run check
+----- stdout+stderr -----
+src/server.ts:28:console.log("char-count MCP server started (stdio)");
+src/check.ts:12:console.log("tools:", tools.map((t) => t.name));
+src/check.ts:18:console.log("ok:", JSON.stringify(ok));
+src/check.ts:21:console.log("ng:", JSON.stringify(ng));
+
+> char-count-mcp@0.1.0 build
+> tsc
+
+
+> char-count-mcp@0.1.0 check
+> node dist/check.js
+
+tools: [ 'count_chars' ]
+ok: {"content":[{"type":"text","text":"文字数: 15 / 行数: 2 / UTF-8: 50 バイト"}]}
+ng: {"content":[{"type":"text","text":"MCP error -32602: Input validation error: Invalid arguments for tool count_chars: Too small: expected string to have >=1 characters at text"}],"isError":true}
+----- exit=0 -----

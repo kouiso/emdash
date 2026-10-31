@@ -1,0 +1,11 @@
+--- src/tool.ts（記事の形）
++++ src/tool.ts（return json に変えた実験）
+@@ -7,7 +7,7 @@
+   if (json.type !== "object") {
+     throw new Error(`ツールの入力は object のスキーマにします（実際は ${String(json.type)}）`);
+   }
+-  return { ...json, type: "object" };
++  return json;
+ }
+ 
+ const searchOrdersTool: Anthropic.Tool = {

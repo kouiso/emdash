@@ -1,0 +1,16 @@
+code package.json: True
+code count.ts: True
+code estimate.ts: True
+code unknown-model.ts: True
+run 01 command == article command (mkdir token-cost-estimate) and exit 0: True
+run 02 command == article command (npm install) and exit 0: True
+  output of run 02 appears verbatim in article: True
+run 03 command == article command (node count.ts) and exit 0: True
+  output of run 03 appears verbatim in article: True
+run 04 command == article command (node estimate.ts) and exit 0: True
+  output of run 04 appears verbatim in article: True
+run 05 command == article command (node unknown-model.ts) and exit 0: True
+  output of run 05 appears verbatim in article: True
+lead line (run 04 first line) in article: True
+run 09 (no network) reproduces 03/04/05 outputs: True
+ALL OK

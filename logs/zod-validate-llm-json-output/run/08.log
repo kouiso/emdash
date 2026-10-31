@@ -1,0 +1,15 @@
+date: 2026-10-31T09:12:08+00:00
+cwd: (作業フォルダ zod-llm-check)
+node: v22.22.0 / npm: 10.9.4
+note: 見本 extra-key
+command: node check.ts extra-key
+----- stdout+stderr -----
+[
+  {
+    code: 'unrecognized_keys',
+    keys: [ 'confidence' ],
+    path: [],
+    message: 'Unrecognized key: "confidence"'
+  }
+]
+----- exit=0 -----

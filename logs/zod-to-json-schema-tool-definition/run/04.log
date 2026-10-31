@@ -1,0 +1,43 @@
+date: 2026-10-31 09:10:42 +0000
+cwd: /path/to/zod-tool-schema
+node: v22.22.0
+npm: 10.9.4
+command: node src/tool.ts
+exit: 0
+--- stdout+stderr ---
+{
+  "name": "search_orders",
+  "description": "ネットショップの注文を、注文した人のメールアドレスと注文の状態で検索する。新しい注文から順に、最大 limit 件の注文番号と注文日を返す。",
+  "input_schema": {
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "type": "object",
+    "properties": {
+      "email": {
+        "type": "string",
+        "format": "email",
+        "pattern": "^(?:[A-Za-z0-9_'+\\-]+\\.)*[A-Za-z0-9_'+\\-]*[A-Za-z0-9_+-]@(?:[A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$",
+        "description": "注文した人のメールアドレス"
+      },
+      "status": {
+        "type": "string",
+        "enum": [
+          "pending",
+          "shipped",
+          "cancelled"
+        ],
+        "description": "注文の状態。pending は発送前、shipped は発送済み、cancelled はキャンセル済み"
+      },
+      "limit": {
+        "default": 10,
+        "description": "返す注文の最大件数。省略すると10件",
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 50
+      }
+    },
+    "required": [
+      "email",
+      "status"
+    ]
+  }
+}

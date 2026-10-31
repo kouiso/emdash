@@ -1,0 +1,8 @@
+date: 2026-10-31T09:12:06+00:00
+cwd: (作業フォルダ zod-llm-check)
+node: v22.22.0 / npm: 10.9.4
+note: 記事の準備の節。package.json を置く（書き写す代わりに cp）
+command: cp (code)/package.json . && ls
+----- stdout+stderr -----
+package.json
+----- exit=0 -----

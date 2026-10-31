@@ -1,0 +1,20 @@
+CODE package.json: SAME
+CODE samples.ts: SAME
+CODE reproduce.ts: SAME
+CODE extract-json.ts: SAME
+CODE fix.ts: SAME
+CODE stop-reason.ts: SAME
+CODE naive-repair.ts: SAME
+CMD 'node -v': run/01.log exit=0
+OUT after 'node -v' vs run/01.log: SAME
+CMD 'mkdir llm-json-parse': run-all.sh の手順で実行（ログ行なし）
+CMD 'cd llm-json-parse': run-all.sh の手順で実行（ログ行なし）
+CMD 'node reproduce.ts': run/02.log exit=0
+OUT after 'node reproduce.ts' vs run/02.log: SAME
+CMD 'node fix.ts': run/03.log exit=0
+OUT after 'node fix.ts' vs run/03.log: SAME
+CMD 'node stop-reason.ts': run/04.log exit=0
+OUT after 'node stop-reason.ts' vs run/04.log: SAME
+CMD 'node naive-repair.ts': run/05.log exit=0
+OUT after 'node naive-repair.ts' vs run/05.log: SAME
+ALL OK
