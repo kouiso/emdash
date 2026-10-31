@@ -1,0 +1,67 @@
+code package.json: True
+code embed.ts: True
+code show-vector.ts: True
+code docs.ts: True
+code vector-search.ts: True
+code search.ts: True
+command 'mkdir local-embeddings': True
+command 'npm install': True
+command 'ONNXRUNTIME_NODE_INSTALL=skip npm install': True
+command 'node show-vector.ts "返金はいつ？"': True
+command 'du -sh node_modules/@huggingface/transformers/.cache': True
+command 'node search.ts "返金はいつ？"': True
+command 'node search.ts "家に届くまで何日？"': True
+command 'node search.ts "宿題を手伝って" 8': True
+run/01.log command matches article: True (mkdir local-embeddings)
+run/03.log command matches article: True (npm install)
+run/04.log command matches article: True (du -sh node_modules)
+run/14.log command matches article: True (bash -c ONNXRUNTIME_NODE_INSTALL=skip npm install)
+run/15.log command matches article: True (du -sh node_modules)
+run/06.log command matches article: True (node show-vector.ts 返金はいつ？)
+run/07.log command matches article: True (du -sh node_modules/@huggingface/transformers/.cache)
+run/08.log command matches article: True (node show-vector.ts 返金はいつ？)
+run/10.log command matches article: True (node search.ts 返金はいつ？)
+run/11.log command matches article: True (node search.ts 家に届くまで何日？)
+run/12.log command matches article: True (node search.ts 宿題を手伝って 8)
+run/16.log command matches article: True (node search.ts 返金はいつ？)
+output run/04.log in article: True
+output run/06.log in article: True
+output run/07.log in article: True
+output run/10.log in article: True
+output run/11.log in article: True
+output run/12.log in article: True
+run/10 output appears twice: True
+run/08 == run/06: True; run/16 == run/10: True; run/17 offline has 06/10/11/12 outputs, 4x exit=0, EAI_AGAIN: True
+run/03 added 46 packages: True
+run/15 484M: True
+run/22 cuda 272054000: True
+run/18 4 files incl. model_quantized 118308185: True
+run/24 onnxruntime-node largest: True
+run/25 versions: True
+run/21 tsc_exit=0: True
+run 01 exit=0 elapsed=6ms
+run 02 exit=0 elapsed=6ms
+run 03 exit=0 elapsed=26677ms
+run 04 exit=0 elapsed=22ms
+run 05 exit=0 elapsed=6ms
+run 06 exit=0 elapsed=4340ms
+run 07 exit=0 elapsed=6ms
+run 08 exit=0 elapsed=2576ms
+run 09 exit=0 elapsed=6ms
+run 10 exit=0 elapsed=2725ms
+run 11 exit=0 elapsed=2836ms
+run 12 exit=0 elapsed=2886ms
+run 13 exit=0 elapsed=10ms
+run 14 exit=0 elapsed=9631ms
+run 15 exit=0 elapsed=20ms
+run 16 exit=0 elapsed=4577ms
+run 17 exit=0 elapsed=12635ms
+run 18 exit=0 elapsed=6ms
+run 19 exit=0 elapsed=1978ms
+run 20 exit=0 elapsed=1955ms
+run 21 exit=0 elapsed=642ms
+run 22 exit=0 elapsed=8ms
+run 23 exit=0 elapsed=26ms
+run 24 exit=0 elapsed=27ms
+run 25 exit=0 elapsed=516ms
+ALL OK

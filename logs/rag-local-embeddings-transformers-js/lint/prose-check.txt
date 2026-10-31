@@ -1,0 +1,7 @@
+sentences: 198 (prose+frontmatter 145, headings 10, table cells 43)
+not counted: code block lines 107, URL-only table cells 13 (lines [362, 363, 364, 365, 366, 367, 368, 369, 370, 371, 372, 373, 374])
+LONG>60: 0  (50<len<=60: 20)
+prose length min 13 / max 60 / short(<=20) 10 / long(41-60) 63
+SAME3: 0
+PAT 'まとめ' 255 `createVectorSearch` を呼んだ時点で、8件の文書をまとめてベクトルにします。
+AND/OR candidates (や in prose, judge by eye):
