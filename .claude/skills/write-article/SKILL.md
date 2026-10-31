@@ -97,12 +97,13 @@ guides/09 §1-2 の文体規約を、執筆前に自分への指示として読�
 - 具体例は検証できるものだけ。出典のない伝聞は書かない
 - 太字マークアップは使わない（checklist C30）。章境界アナウンスと、冒頭の主張を結末でそのまま繰り返す締めも使わない
 
-lint で FATAL になりやすく、技術記事で書きがちな語があります。次の語は地の文に書きません。言い換えが必要なときは括弧内の形にします。
+lint で FATAL になりやすく、技術記事で書きがちな語があります。次の語は地の文に書きません。言い換えが必要なときは括弧内の形にします。この一覧は実際に FATAL になるのを確かめた例で、FATAL になる語をすべて挙げたものではありません。一覧に無い語でも FATAL になるので、合否は必ず手順7で lint を実行して決めます。
 
 - 「仕様書」「設計書」（⑬テンプレ比喩として FATAL）→「仕様」「仕様のページ」「設計」
-- 「地図」「レシピ」（同上）→ 具体的な名前で書く
-- 「ここから」「まとめます」「整理します」「ということです。」（⑫章境界アナウンスとして FATAL）→ 削るか、内容で書く
+- 「地図」「レシピ」「スパイス」（同上。「スパイス」は1語だけの文でも FATAL になることを確かめた）→ 具体的な名前で書く
+- 「ここから」「まとめます」「整理します」「ということです。」「〜を順番に見ていきます」（⑫章境界アナウンスとして FATAL。「具体的な特徴を順番に見ていきます。」の1文だけでも FATAL になる。「設定を見ていきます。」は ②メタ発言の warn にとどまる）→ 削るか、内容で書く
 - 「── 」「—」「─」と、全角コロンの直後の空白（記号NG として FATAL）→ 読点、括弧、改行に開く
+- 「――」（U+2015 の二重ダッシュ）は ai-smell-lint では検出されないが、writing-lint の DENSITY「B-5 ダッシュ」に数えられ、checklist C31 にも当たる → 同じく読点、括弧、改行に開く
 - 否定対比（「〜ではない。」「〜のではなく」など）は本文で2回以上あると FATAL、見出しの中なら1回でも FATAL になる
 
 悪い例として語を引用するときは、guides/03 の「悪い例を引用するときの書き方」の3点（引用符でくくる、悪い例だと明示する、直後に直し方を置く）を守ります。
@@ -148,11 +149,11 @@ python3 vendor/tech-writing-pack/scripts/writing-lint.py content/articles/<slug>
 | スクリプト | 合格の条件（このゲートでの扱い） | 出力の読み方 |
 |---|---|---|
 | `ai-smell-lint.py` | 終了コード 0、かつ `🚨FATAL` が0件。加えて、下の「frontmatter の扱い」で FATAL に当たるものが0件 | `🚨FATAL` と `⚠️warn` は地の文での使用（use）、`📎mention` は引用符の中か「悪い例」などのマーカーがある行での検出。判定は `  --- 判定:` で始まる行に出る。この行は末尾から6行目で、後ろに `※` の注記4行と、スキルのコマンドが足す `exit=` の行が続く。合否は `exit=` の値と、判定行の中身の両方で読む。終了コード 1 は FATAL あり、2 はファイルが読めない |
-| `writing-lint.py` | 終了コード 0、かつ判定行が `### 判定: FATAL 0 / DENSITY超過 0 / SHOULD n` の形で、FATAL と DENSITY超過がどちらも 0 | FATAL があると終了コード 1。DENSITY 超過はスクリプト上は終了コード 0 のまま「書き手の判断」になるが、このゲートでは pack の README と guides/09 §2 の「上限まで間引く」に従い、0 になるまで間引く。`SHOULD` と `WATCH` は違反ではないが、1件ずつ判断して記録する |
+| `writing-lint.py` | 終了コード 0、かつ判定行が `### 判定: FATAL 0 / DENSITY超過 0 / SHOULD n` の形で、FATAL と DENSITY超過がどちらも 0 | 出力は `### FATAL` `### DENSITY` `### SHOULD` `### INFO(要人間確認)` の節と、末尾から3行目の判定行（後ろに `→` の1行と `exit=` の行）。原稿に転用動詞（「テストが落ちる」「CIを回す」の落ちる系・回す系など）があるときだけ、DENSITY と SHOULD の間に `### WATCH（転用動詞・参考カウント: …）` の節も出る。無いときは節ごと出ない。FATAL があると終了コード 1。DENSITY 超過（`[🔴超過]` の行）はスクリプト上は終了コード 0 のまま「書き手の判断」になるが、このゲートでは pack の README と guides/09 §2 の「上限まで間引く」に従い、0 になるまで間引く。`SHOULD`、`WATCH`、`INFO(要人間確認)` は違反ではなく判定行にも数えられないが、1件ずつ判断して記録する |
 
-両スクリプトとも frontmatter を含めたファイル全体を読みます（コードフェンスの中は対象外）。
+両スクリプトとも frontmatter を含めたファイル全体を読みます（コードフェンスの中は対象外。`ai-smell-lint.py` はインラインコードも対象外）。下の「記事の frontmatter」の例にある `#` のコメントは説明用なので、原稿には写しません。コメントも lint の対象になり、常体のコメント（例「手順10で入れる」）が writing-lint の DENSITY「B-10 文体混在」の超過として出ることを確かめています。
 
-frontmatter の扱い。`ai-smell-lint.py` は ASCII のダブルクオート `"` の中を引用とみなし、そこで見つけた語を `📎mention` にして FATAL の判定から外します。frontmatter の値（`title`、`description`、`sources` の `title`）は `"` でくくるので、そこに FATAL の語があっても終了コードは 0 のままです。そこで次のように扱います。
+frontmatter の扱い。`ai-smell-lint.py` は ASCII のダブルクオート `"` と鉤括弧「」の中を引用とみなし、そこで見つけた語を `📎mention` にして FATAL の判定から外します。frontmatter の値（`title`、`description`、`sources` の `title`）は `"` でくくるので、そこに FATAL の語があっても終了コードは 0 のままです（くくらなければ use として FATAL になります）。そこで次のように扱います。
 
 1. frontmatter の範囲（1行目の `---` から次の `---` まで）の行番号を確かめる。
 2. `ai-smell.txt` で、その範囲の行に出た `📎mention` を探す。出力の件数が表示された行数より多い症状は、下の「警告の扱い」の2つ目のとおり `grep -n` で残りを洗い出し、frontmatter の範囲に入るものを拾う。`--strict` を付けると mention も判定に入るが、本文で悪い例を引用しただけでも終了コードが 1 になるので、このゲートの合否には使わない。
@@ -163,8 +164,8 @@ writing-lint.py の FATAL のうち個人名の検出は、スクリプトの `P
 
 警告の扱い。
 
-- `ai-smell-lint.py` の `⚠️warn` と `📎mention`、`writing-lint.py` の `SHOULD` と `WATCH`（と、超過したときの DENSITY）は、1件ずつ `logs/<slug>/lint/judgments.md` に書く。書く内容は、行番号、検出された語、use か mention か、直したか残したか、残した理由。
-- 両スクリプトは、症状やカウンタごとに先頭の数件しか行番号を出さない（`ai-smell-lint.py` は1症状5件まで、`writing-lint.py` は SHOULD が12件、WATCH が5件、DENSITY が4件まで）。出力にある件数（例「7件(use)」「SHOULD: 15件」）が表示された行数より多いときは、検出語で原稿を `grep -n` して残りの行番号を自分で洗い出し、全件を judgments.md に書く。スクリプトは書き換えない。
+- `ai-smell-lint.py` の `⚠️warn` と `📎mention`、`writing-lint.py` の `SHOULD`、`WATCH`（出たときだけ）、`INFO(要人間確認)`（と、超過したときの DENSITY）は、1件ずつ `logs/<slug>/lint/judgments.md` に書く。書く内容は、行番号、検出された語、use か mention か、直したか残したか、残した理由。`WATCH` は「転用か、実体のある用法か」を判断し、転用なら具体的な動作に書き直す（例「テストが落ちる」→「テストが失敗する」）。
+- 両スクリプトは、症状やカウンタごとに先頭の数件しか行番号を出さない（`ai-smell-lint.py` は1症状5件まで、`writing-lint.py` は SHOULD が12件、DENSITY が1カウンタ4件、WATCH が1動詞5件まで。INFO は9件まで全部出ることを確かめている）。出力にある件数（例「7件(use)」「SHOULD: 15件」）が表示された行数より多いときは、検出語で原稿を `grep -n` して残りの行番号を自分で洗い出し、全件を judgments.md に書く。スクリプトは書き換えない。
 - `📎mention` と出ても地の文で使っていれば直す。悪い例の引用なのに `🚨FATAL`（use）と判定されたときは、guides/03「悪い例を引用するときの書き方」の3点に合わせて書き直し、lint が `📎mention` と判定する形にする。checklist の C35 は「引用なら合格」としているが、このゲートは C33「FATALがゼロ」も同時に求めるので、終了コード 0 になるまで書き直す。判断の経緯は judgments.md に書く。
 - 直したら2本とも回し直し、最後の実行結果で上書きする。
 
@@ -198,7 +199,7 @@ writing-lint.py の FATAL のうち個人名の検出は、スクリプトの `P
 | # | 条件 | 確かめ方と記録先 |
 |---|---|---|
 | G01 | `ai-smell-lint.py` の FATAL が0件。frontmatter の行（`title`、`description`、`sources` の `title`）で出た `📎mention` は use として扱い、FATAL に当たる種類なら不合格（手順7の「frontmatter の扱い」）。warn は1件ずつ判断し、use か mention かを記録した | `lint/ai-smell.txt`、`lint/judgments.md` |
-| G02 | `writing-lint.py` の判定行が `### 判定: FATAL 0 / DENSITY超過 0 / SHOULD n` の形で、FATAL と DENSITY超過がどちらも 0。SHOULD と WATCH は1件ずつ判断を記録した。この FATAL 0 では個人名を検出できない（`PERSONAL_NAMES` が空）ので、個人名は G09 で確かめる | `lint/writing-lint.txt`、`lint/judgments.md` |
+| G02 | `writing-lint.py` の判定行が `### 判定: FATAL 0 / DENSITY超過 0 / SHOULD n` の形で、FATAL と DENSITY超過がどちらも 0。SHOULD、WATCH（出たときだけ）、INFO(要人間確認) は1件ずつ判断を記録した。この FATAL 0 では個人名を検出できない（`PERSONAL_NAMES` が空）ので、個人名は G09 で確かめる | `lint/writing-lint.txt`、`lint/judgments.md` |
 | G03 | 下の B の全項目を満たす | `gate.md` |
 | G04 | 記事のコードを記事の形のまま実際に動かし、ログがある。API を呼ぶ記事で `ANTHROPIC_API_KEY` が無いときは不合格 | `code/`、`run/` |
 | G05 | 断定した事実すべてに一次情報の出典（URL とアクセス日）がある。料金の目安がある（API を呼ぶ記事は出典付きの金額、呼ばない記事は料金がかからないこと） | `sources.md`、frontmatter `sources` |
@@ -311,7 +312,7 @@ logs/<slug>/
 ├── lint/
 │   ├── ai-smell.txt      # 手順7 最後の実行の出力と exit=
 │   ├── writing-lint.txt  # 手順7 最後の実行の出力と exit=
-│   └── judgments.md      # 手順7 warn・mention・SHOULD・WATCH を1件ずつ判断した記録
+│   └── judgments.md      # 手順7 warn・mention・SHOULD・WATCH・INFO を1件ずつ判断した記録
 ├── gate.md           # 手順8 公開前ゲートの表（A と B の全行に判定と根拠）
 └── publish.md        # 手順10 以降 投稿・予約・公開・修正・取り下げの記録
 ```
