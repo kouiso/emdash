@@ -176,10 +176,14 @@ sitemap は最大1時間、robots.txt は最大1日、古い内容がキャッ�
 5. Search Console、Web Analytics、Turnstile の登録
    - Google Search Console にサイトを追加し、所有権の確認を済ませます。
    - Search Console のデータを Claude が読めるように認証します。手でトークンを作って渡す方法は使わず、ユーザーがログインして許可する方法（コネクタの OAuth など）にします（CLAUDE.md の秘密情報のルール）。具体的な方法は「実装時にドキュメントで確認する」項目です。
-   - Cloudflare のダッシュボードで Web Analytics を有効にします。ビーコンのトークンの発行が要るかどうかを含め、手順は「実装時にドキュメントで確認する」項目です。
-   - Cloudflare のダッシュボードで Turnstile のサイトキーとシークレットキーを発行します。シークレットキーは、Worker の secret として登録します（ダッシュボードの Variables and Secrets）。リポジトリには入れません。具体的な登録手順は「実装時にドキュメントで確認する」項目です。
+   - Cloudflare のダッシュボードで Web Analytics を有効にします。ビーコンのトークンの発行が要るかどうかを含め、手順は「実装時にドキュメントで確認する」項目です。トークンは公開してよい値なので、Claude に伝えます。Claude が `wrangler.jsonc` の `vars` に `PUBLIC_CF_ANALYTICS_TOKEN` として書いて push します。
+   - Cloudflare のダッシュボードで Turnstile のサイトキーとシークレットキーを発行します。サイトキーは公開してよい値なので Claude に伝え、Claude が `vars` に `PUBLIC_TURNSTILE_SITE_KEY` として書いて push します。シークレットキーだけを、Worker の secret として登録します（ダッシュボードの Variables and Secrets で、種類を Secret にする）。リポジトリには入れず、Claude にも渡しません。
+   - **サイトキーやトークンを、ダッシュボードの変数（種類が Text のもの）として登録しないでください。** push のたびに走る `wrangler deploy` が `wrangler.jsonc` の `vars` でダッシュボードの変数を上書きするので、次の deploy で消えます。secret は消えません（https://developers.cloudflare.com/workers/wrangler/configuration/ 、2026-10-31 確認。[docs/decisions/site-url.md](./docs/decisions/site-url.md)）。
+   - Turnstile のキーが2つそろうまで、本番の登録フォームは入力欄を無効にし、登録を受け付けません（[docs/decisions/subscribe.md](./docs/decisions/subscribe.md)）。
+   - プライバシーポリシーに載せる問い合わせ先のメールアドレスを決め、Claude に伝えます。Claude が `vars` に `PUBLIC_CONTACT_EMAIL` として書いて push します。決まるまで、登録フォームは受け付けません（登録した人が削除を頼む先が無いため）。
 6. キーワードの CSV を渡す
    - メインキーワード6語のそれぞれをラッコキーワードにかけ、書き出した CSV を渡します。置き場所と名前は [keywords/README.md](./keywords/README.md) にあります。
+   - **CSV は public のこのリポジトリを通して渡しません。** コミット、push、Issue や PR への添付、Gist はどれも使いません。ラッコキーワードの規約で、データの第三者への提供にライセンスが要るためです（keywords/README.md）。Claude Code の作業環境に直接置く方法で渡します。`keywords/*.csv` は `.gitignore` 済みです。
    - CSV が1つも無いあいだ、Claude は記事を書き始めません。
 7. パイロット記事の報告に返事をする
    - 最初の1本を予約公開まで通したら、Claude がゲートの結果と気になった点を報告します。
@@ -187,13 +191,13 @@ sitemap は最大1時間、robots.txt は最大1日、古い内容がキャッ�
 
 ## 個人情報と法律まわり
 
-メルマガ登録でメールアドレスを集めるため、次の3点を決めています。前の2点はこれから作る部分で、3点目は今回は作りません。
+メルマガ登録でメールアドレスを集めるため、次の3点を決めています。前の2点は作ってあり、3点目は今回は作りません。
 
-- プライバシーポリシーのページを置き、集める情報（メールアドレス）と使い道（メルマガと特典の送付）を書きます。
-- 登録フォームには Cloudflare Turnstile（無料）を入れ、ボットの登録を防ぎます。
+- プライバシーポリシーのページ（`/privacy`）に、集める情報（メールアドレス）、使い道（メルマガと特典の送付）、保存場所（D1）と読み書きする人、削除の依頼方法を書いています。問い合わせ先（`PUBLIC_CONTACT_EMAIL`）が決まるまで、登録フォームは受け付けません。
+- 登録フォームには Cloudflare Turnstile（無料）を入れ、ボットの登録を防ぎます。本番ではキーが2つそろうまで登録を受け付けません。
 - 特定商取引法に基づく表記は今回の範囲外です。教材を売り始めるときに用意します。
 
-配信サービスにはまだつなぎません。フォームの保存先は、EmDash にフォーム機能があればそれを使い、なければ D1 に保存します。どちらにするかは実装時にドキュメントで確認します。
+配信サービスにはまだつないでいません。EmDash に使えるフォーム機能が無いので、登録は D1 の独自テーブル `newsletter_subscribers` に保存します（[docs/decisions/subscribe.md](./docs/decisions/subscribe.md)）。最初のメールを送る前にダブルオプトインにします（[docs/verification/post-deploy.md](./docs/verification/post-deploy.md) の 6）。
 
 ## 役に立ったかを測る
 
@@ -205,19 +209,20 @@ PoC の目的は、自動化した執筆と公開が役に立つかを判断す�
 
 ## 現状
 
-2026-10-30 時点では、サイトは Cloudflare にまだ deploy されていません。公開 URL はありません。経緯は [PBI #1](https://github.com/kouiso/emdash/issues/1) と [VERIFICATION.md](./VERIFICATION.md) に記録しています。
+2026-10-31 時点では、サイトは Cloudflare にまだ deploy されていません。公開 URL は `https://ai-eng-blog.kouiso.workers.dev` に決めましたが、まだ何も表示されません。経緯は [PBI #1](https://github.com/kouiso/emdash/issues/1) と [VERIFICATION.md](./VERIFICATION.md) に記録しています。deploy のあとに確かめることは [docs/verification/post-deploy.md](./docs/verification/post-deploy.md) にまとめています。
 
 - 接続済みの Cloudflare プラグインでアセットのアップロードセッションは作れましたが、アセットのアップロード API が `Unauthorized` を返しました。原因はわかっていません。
 - この作業環境では Wrangler の CLI が未認証で、Cloudflare API への直接のリクエストは HTTP 403 で拒否されます。失敗のあと、新しい認証や別の公開経路は試していません。
-- 作成済みのリソースは次のとおりです。中身は空で、あとで正式に deploy するときに使います。
+- 作成済みのリソースは次のとおりです。あとで正式に deploy するときに使います。中身は、2026-10-31 に持ち主が Cloudflare のダッシュボードで確かめたところ空でした（D1 はテーブル 0、R2 はオブジェクト 0、KV はキー 0）。この作業環境からは Cloudflare に入れないので、Claude は確かめていません。
   - D1 `emdash-trial-20261021-db`（バインディング `DB`）
   - R2 `emdash-trial-20261021-media`（バインディング `MEDIA`）
   - KV `emdash-trial-20261021-session`（Astro 標準の `SESSION`）
-- Worker はまだ作成も deploy もされていません。`wrangler.jsonc` の Worker 名は `ai-eng-blog` です（2026-10-31 に旧名 `emdash-trial-20261021` から変更。旧名の Worker は一度も作られていないので、消すものはありません）。D1、R2、KV は上の旧名のリソースをそのまま使い、名前、ID、バインディングは変えていません。静的アセットは Workers Assets（`ASSETS`）で配る設定です。
+- Worker `ai-eng-blog` はまだ作成も deploy もされていません（`wrangler.jsonc` の Worker 名。2026-10-31 に旧名 `emdash-trial-20261021` から変更）。D1、R2、KV は上の旧名のリソースをそのまま使い、名前、ID、バインディングは変えていません。静的アセットは Workers Assets（`ASSETS`）で配る設定です。
+- 旧名の Worker `emdash-trial-20261021` は、ダッシュボードに中身の無い Worker として存在します。一度も deploy されておらず、バインディングは無く、workers.dev とプレビューの URL は無効で、外から届きません（2026-10-31 に持ち主がダッシュボードで確かめた内容。Claude は確かめていません）。以前は「作られていない」と書いていましたが、誤りでした。残しておいても公開されないので、消すかどうかは持ち主が決めます。
 - Workers Builds では、ダッシュボードの Worker 名と `wrangler.jsonc` の `name` が一致しないとビルドが失敗します（https://developers.cloudflare.com/workers/ci-cd/builds/troubleshoot/ 、2026-10-31 確認）。Worker をつなぐときは `ai-eng-blog` という名前にします。
 - リポジトリ名は旧名（`emdash`）のままです。`package.json` と `package-lock.json` の `name` は `ai-eng-blog` です。
-- Access、LOADER、AI、メール、独自 DNS、有料 CI は追加していません。フォントは OS 標準、画像変換は無効です。
-- ローカルでのビルド、型チェック、`wrangler deploy --dry-run` は 2026-10-25 に通っています（VERIFICATION.md）。
+- Access、LOADER、AI、メール、独自 DNS、有料 CI は追加していません。フォントは OS 標準で、外部の Web フォントは読み込みません（2026-10-31 に Google Fonts の読み込みを外しました）。画像変換は無効です。
+- ローカルでのビルド、型チェック、テスト（`npm test`）、`wrangler deploy --dry-run`、`wrangler dev --local` と Playwright での画面の確認は、2026-10-31 に通っています（VERIFICATION.md の「2026-10-31 の追記」）。
 
 上の「ユーザーにしかできないこと」の1が済めば、deploy は GitHub への push から行われる見込みです。今回の `Unauthorized` がその経路でも起きるかは、まだ確かめていません。
 
