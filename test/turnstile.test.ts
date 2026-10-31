@@ -67,6 +67,20 @@ describe("verifyTurnstileToken", () => {
 		});
 	});
 
+	it("skips the hostname check for Cloudflare's testing keys (they always report example.com)", async () => {
+		const siteverify = fakeSiteverify({
+			success: true,
+			hostname: "example.com",
+			metadata: { result_with_testing_key: true },
+		});
+		expect(await verifyTurnstileToken(SECRET, "XXXX.DUMMY.TOKEN.XXXX", "localhost", siteverify.impl)).toEqual({ ok: true });
+	});
+
+	it("still checks the hostname when metadata.result_with_testing_key is not true", async () => {
+		const siteverify = fakeSiteverify({ success: true, hostname: "example.com", metadata: { result_with_testing_key: "true" } });
+		expect((await verifyTurnstileToken(SECRET, "tok", "localhost", siteverify.impl)).ok).toBe(false);
+	});
+
 	it("rejects a response without hostname", async () => {
 		const siteverify = fakeSiteverify({ success: true });
 		expect((await verifyTurnstileToken(SECRET, "tok", "site.example", siteverify.impl)).ok).toBe(false);

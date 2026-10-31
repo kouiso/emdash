@@ -45,7 +45,7 @@ export type TurnstileResult = { ok: true } | { ok: false; reason: "missing_token
 
 function isSiteverifyResponse(
 	value: unknown,
-): value is { success: boolean; hostname?: unknown; "error-codes"?: unknown } {
+): value is { success: boolean; hostname?: unknown; metadata?: unknown; "error-codes"?: unknown } {
 	return typeof value === "object" && value !== null && typeof Reflect.get(value, "success") === "boolean";
 }
 
@@ -92,7 +92,10 @@ export async function verifyTurnstileToken(
 	}
 	// siteverify の応答の hostname は「チャレンジを出したホスト名」。docs のベストプラクティスに従って照合する
 	// （https://developers.cloudflare.com/turnstile/get-started/server-side-validation/ 2026-10-31 確認）
-	if (data.hostname !== expectedHostname) {
+	// Cloudflare のテスト用シークレットは hostname に常に "example.com" を返し、metadata.result_with_testing_key を付ける
+	// （2026-10-31 に siteverify を直接呼んで確認）。テスト用のキーはどのトークンでも通すので、照合しても守れるものは無い
+	const testingKey = typeof data.metadata === "object" && data.metadata !== null && Reflect.get(data.metadata, "result_with_testing_key") === true;
+	if (!testingKey && data.hostname !== expectedHostname) {
 		console.warn("[turnstile] hostname mismatch", { expected: expectedHostname, actual: data.hostname });
 		return { ok: false, reason: "rejected" };
 	}

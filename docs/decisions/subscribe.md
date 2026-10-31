@@ -74,6 +74,7 @@ IP アドレスは保存しない。プライバシーポリシー（`/privacy`�
   TURNSTILE_SECRET_KEY=1x0000000000000000000000000000000AA
   ```
   この組み合わせは常に通る。常に落とすときはシークレットを `2x0000000000000000000000000000000AA` にする。出典: https://developers.cloudflare.com/turnstile/troubleshooting/testing/
+  テスト用のシークレットの siteverify は `hostname` に常に `"example.com"` を返し、`metadata.result_with_testing_key: true` を付ける（2026-10-31 に siteverify を直接呼んで確認）。この印があるときだけ hostname の照合を飛ばす。テスト用のキーはどのトークンでも通すので、照合しても守れるものは無い。2026-10-31 にこのキーを `--var` で渡した `wrangler dev --local` で、ダミーのトークン `XXXX.DUMMY.TOKEN.XXXX` の登録が 200、トークンなしが `captcha_failed` になることを確かめた。
 - siteverify の仕様（URL、`secret` と `response`、トークンは最大 2048 文字で5分有効・1回だけ）: https://developers.cloudflare.com/turnstile/get-started/server-side-validation/
 - 1回送信するたびに、トップの JS が `turnstile.reset()` でトークンを取り直す。
 
