@@ -1,6 +1,7 @@
 import type { APIRoute } from "astro";
 import { SUBSCRIBE_HTTP_STATUS, SUBSCRIBE_MESSAGES, type SubscribeStatus } from "../../utils/subscribe-messages";
-import { normalizeEmail, saveSubscriber } from "../../utils/subscribers";
+import { normalizeEmail } from "../../utils/email";
+import { saveSubscriber } from "../../utils/subscribers";
 import { getTurnstileMode, verifyTurnstileToken } from "../../utils/turnstile";
 
 export const prerender = false;

@@ -3,19 +3,6 @@ import { env } from "cloudflare:workers";
 /** プライバシーポリシーの版。同意した版を登録ごとに保存する。ポリシーを変えたら更新する */
 export const PRIVACY_POLICY_VERSION = "2026-10-31";
 
-// RFC 5321 のアドレス長の上限
-const MAX_EMAIL_LENGTH = 254;
-// 「@ の前後に空白と @ 以外がある」「ドメインに . がある」だけを見る。
-// 厳密な RFC 5322 判定はせず、届くかどうかは配信時のバウンスで判断する
-const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-export function normalizeEmail(raw: FormDataEntryValue | null): string | null {
-	if (typeof raw !== "string") return null;
-	const email = raw.trim().toLowerCase();
-	if (email.length === 0 || email.length > MAX_EMAIL_LENGTH) return null;
-	return EMAIL_PATTERN.test(email) ? email : null;
-}
-
 // EmDash のテーブル（ec_*、_emdash_* など）と名前がぶつからないよう接頭辞を付けない独自名にする。
 // EmDash のマイグレーションはサイト側のテーブルを管理しないので、初回の書き込みで作る。
 const CREATE_TABLE_SQL = `CREATE TABLE IF NOT EXISTS newsletter_subscribers (
