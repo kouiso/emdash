@@ -1,0 +1,32 @@
+date: 2026-10-31T07:08:45+00:00
+cwd: (作業フォルダ char-count-mcp)
+node: v22.22.0 / npm: 10.9.4 / claude: 2.1.314 (Claude Code)
+note: 記事の stdout の節。src/server.ts の最後の行の console.error を console.log に変え、build と check を実行
+command: diff -u ../server.ts.orig src/server.ts
+----- stdout+stderr -----
+--- ../server.ts.orig	2026-10-31 07:08:45.945329085 +0000
++++ src/server.ts	2026-10-31 07:08:46.076029806 +0000
+@@ -25,4 +25,4 @@
+ );
+ 
+ await server.connect(new StdioServerTransport());
+-console.error("char-count MCP server started (stdio)");
++console.log("char-count MCP server started (stdio)");
+----- exit=1 -----
+command: npm run build
+----- stdout+stderr -----
+
+> char-count-mcp@0.1.0 build
+> tsc
+----- exit=0 -----
+command: npm run check
+----- stdout+stderr -----
+
+> char-count-mcp@0.1.0 check
+> node dist/check.js
+
+client error: Unexpected token 'c', "char-count"... is not valid JSON
+tools: [ 'count_chars' ]
+ok: {"content":[{"type":"text","text":"文字数: 15 / 行数: 2 / UTF-8: 50 バイト"}]}
+ng: {"content":[{"type":"text","text":"MCP error -32602: Input validation error: Invalid arguments for tool count_chars: Too small: expected string to have >=1 characters at text"}],"isError":true}
+----- exit=0 -----

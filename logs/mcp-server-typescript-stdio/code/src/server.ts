@@ -8,7 +8,7 @@ server.registerTool(
   "count_chars",
   {
     title: "文字数を数える",
-    description: "日本語の文章の文字数・行数・UTF-8 のバイト数を返す。絵文字や結合文字は見た目の1文字を1と数える。",
+    description: "日本語の文章の文字数・行数・UTF-8 のバイト数を返す。文字数は見た目の1文字を1と数え、改行も1文字に含める。行数は改行（LF）で区切った数で、末尾が改行なら最後の空の行も1行と数える。",
     inputSchema: {
       text: z.string().min(1).max(10_000).describe("数えたい文章"),
     },
