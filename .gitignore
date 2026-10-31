@@ -14,3 +14,6 @@ worker-configuration.d.ts
 !.env.example
 .dev.vars
 .dev.vars.*
+
+# ラッコキーワードの生データは public リポジトリに置かない（規約 第26・28・29条の扱いが未確定）
+keywords/*.csv
