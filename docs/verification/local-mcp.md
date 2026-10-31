@@ -51,6 +51,24 @@
 | 20 | `content_schedule` に `2026-11-30T09:00:00+09:00` | — | `scheduledAt:"2026-11-30T00:00:00.000Z"`。JST のオフセット付きでも受け付けて UTC で保存する |
 | 21 | `content_unschedule` | `_rev` は要らない | `status:"draft"`、`scheduledAt:null` |
 
+### 追加: タクソノミーを付けた作成の部分書き込み（EmDash 1.4.0、2026-10-31）
+
+記事検証の途中で、まだ無い term を `taxonomies` に入れて `content_create` を呼んだら、エラーが返ったのに下書きができていた。手順 1〜2・6 と同じやり方で、新しい `--persist-to`（スクラッチパッドの `wr-tax`）を使って再現した。トークンはローカル DB 専用・7 日で、作業後に削除した。終わったら DB も削除し、既定の `.wrangler/` は sha256 で 22 ファイルとも変わっていないことを確かめた。
+
+| # | 呼び出し | 要点 | 結果 |
+|---|---|---|---|
+| 22 | `taxonomy_list_terms` `{taxonomy:"tag"}` | — | `items:[]` |
+| 23 | `content_create` `slug:"tax-a"`、`taxonomies:{tag:["rag"]}` | term がまだ無い | `isError:true`、`[VALIDATION_ERROR] Unknown taxonomy term: tag='rag' (locale 'en')` |
+| 24 | `content_get` `{id:"tax-a"}` | — | エラーにならず `status:"draft"` が返る。**エラーだったのに下書きが残っている** |
+| 25 | 同じ `content_create` をもう一度 | — | `isError:true`、`[SLUG_CONFLICT] Slug 'tax-a' already exists in collection 'posts'` |
+| 26 | `taxonomy_create_term` `{taxonomy:"tag", slug:"rag", label:"RAG"}` → `content_create` `slug:"tax-b"`、`taxonomies:{tag:["rag"]}` | term を先に作る | `isError:false`、`status:"draft"`。D1 の `content_taxonomies` に tax-b と rag の行ができた |
+| 27 | `content_get`（tax-a）→ `content_update` `{_rev, taxonomies:{tag:["rag"]}}` | 残った下書きを直す | `isError:false`。`content_taxonomies` は `[('tax-a','rag'), ('tax-b','rag')]` |
+| 28 | `content_get` `{id:"tax-none"}` | 存在しない slug | `isError:true`、`[NOT_FOUND] Content item not found: tax-none` |
+
+原因: `emdash@1.4.0` の `src/api/handlers/content.ts` の `handleContentCreate` は、記事の行を書いたあとで、同じ `withTransaction` の中の `assignTaxonomies` で term を slug から引く。term が無いとそこで `EmDashValidationError` を投げる。`src/database/transaction.ts` のコメントにあるとおり、D1 ではトランザクションが使えないので `withTransaction` は文を順に実行するだけになる。だから投げたあとも記事の行が残る。npm の最新版は 1.4.0 で（`npm view emdash time`）、upstream の main（https://raw.githubusercontent.com/emdash-cms/emdash/main/packages/core/src/api/handlers/content.ts 、2026-10-31 に参照）も同じ順番のままだ。Cloudflare の D1 のドキュメント（https://developers.cloudflare.com/d1/worker-api/d1-database/ 、2026-10-31 に参照）で、まとめて巻き戻せるのは `batch()` で送った文だけだと確かめた。
+
+このリポジトリでの対処: 依存は書き換えない。write-article の手順10の3で、term を先に揃えてから `content_create` に渡すことにした。`isError` のあとは、作り直す前に `content_get` で下書きの有無を確かめる。
+
 ほかに、`emdash doctor` は「scheduler wiring: Cron Trigger and scheduled() handler found (./src/worker.ts)」で合格した（database のチェックは D1 なので `data.db` が無いと出る。ドキュメントに書かれているとおりの既知の挙動）。
 
 ## うまくいったこと
@@ -72,7 +90,7 @@
 
 | 操作 | 使うツール | 要点 |
 |---|---|---|
-| 作成 | `content_create` | `collection:"posts"`、`slug`、`data:{title, excerpt, content:<Markdownの文字列>}`。既定で draft になる。返る `id`（ULID）と `_rev` を `publish.md` に記録する |
+| 作成 | `content_create` | `collection:"posts"`、`slug`、`data:{title, excerpt, content:<Markdownの文字列>}`。既定で draft になる。返る `id`（ULID）と `_rev` を `publish.md` に記録する。タグは `taxonomy_list_terms` / `taxonomy_create_term` で term を先に揃えてから `taxonomies` で渡す。`isError` のあとは作り直す前に `content_get` で下書きの有無を確かめる（#22〜#28） |
 | 予約 | `content_get` → `content_schedule` | 直前に読んだ `_rev` と、未来の `scheduledAt`（ISO 8601。`+09:00` 付きでよい）を渡す。CONFLICT のときは読み直してやり直す |
 | 公開（すぐ出す場合） | `content_get` → `content_publish` | 予約は消える |
 | 予約の取り消し | `content_unschedule` | `_rev` は要らない |
