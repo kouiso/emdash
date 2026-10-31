@@ -1,0 +1,15 @@
+date: 2026-10-31 13:43:49 +0000
+cwd: /path/to/jp-chunker
+node: v22.22.0
+icu: 77.1
+command: node show-sentences.ts
+exit: 0
+--- stdout+stderr ---
+Intl.Segmenter:
+  "発送の前であれば、マイページから取り消せます。「"
+  "領収書は出ますか？」"
+  "には「はい。」"
+  "とお答えしています。"
+splitSentences:
+  "発送の前であれば、マイページから取り消せます。"
+  "「領収書は出ますか？」には「はい。」とお答えしています。"

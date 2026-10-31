@@ -1,0 +1,8 @@
+date: 2026-10-31 13:43:49 +0000
+cwd: /path/to/jp-chunker
+node: v22.22.0
+icu: 77.1
+command: cp ../code/naive.ts .
+exit: 0
+--- stdout+stderr ---
+

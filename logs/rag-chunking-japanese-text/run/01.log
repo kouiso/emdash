@@ -1,0 +1,8 @@
+date: 2026-10-31 13:43:49 +0000
+cwd: /path/to/work
+node: v22.22.0
+icu: 77.1
+command: mkdir jp-chunker
+exit: 0
+--- stdout+stderr ---
+

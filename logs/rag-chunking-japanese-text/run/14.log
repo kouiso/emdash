@@ -1,0 +1,19 @@
+date: 2026-10-31 13:45:04 +0000
+cwd: /path/to/jp-chunker
+node: v22.22.0
+icu: 77.1
+command: unshare -rn ./offline-all.sh
+exit: 0
+--- stdout+stderr ---
+## node naive.ts
+exit=0
+## node show-sentences.ts
+exit=0
+## node main.ts doc.md 120 40
+exit=0
+## node main.ts doc.md 40 0 | head -n 6
+exit=0
+## node stats.ts
+exit=0
+## outbound fetch
+EAI_AGAIN

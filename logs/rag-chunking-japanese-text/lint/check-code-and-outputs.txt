@@ -1,0 +1,28 @@
+OK   block 4 (line 103) == code/package.json
+OK   block 5 (line 113) == code/doc.md
+OK   block 6 (line 143) == code/naive.ts
+OK   block 8 (line 165) == code/sentences.ts
+OK   block 9 (line 205) == code/show-sentences.ts
+OK   block 12 (line 243) == code/sections.ts
+OK   block 13 (line 280) == code/chunk.ts
+OK   block 14 (line 338) == code/main.ts
+OK   block 19 (line 416) == code/stats.ts
+OK   block 3 (line 96) mkdir/cd, run/01.log command = mkdir jp-chunker
+OK   block 7 (line 153) command 'node naive.ts' == run/04.log command 'node naive.ts', exit 0
+OK   run/04.log exit 0
+OK   block 10 (line 218) command 'node show-sentences.ts' == run/06.log command 'node show-sentences.ts', exit 0
+OK   run/06.log exit 0
+OK   block 15 (line 353) command 'node main.ts doc.md 120 40' == run/08.log command 'node main.ts doc.md 120 40', exit 0
+OK   run/08.log exit 0
+OK   block 17 (line 397) command 'node main.ts doc.md 40 0 | head -n 6' == run/09.log command 'bash -c node main.ts doc.md 40 0 | head -n 6', exit 0
+OK   run/09.log exit 0
+OK   block 20 (line 430) command 'node stats.ts' == run/11.log command 'node stats.ts', exit 0
+OK   run/11.log exit 0
+OK   block 2 (line 78) output == run/04.log stdout
+OK   block 11 (line 222) output == run/06.log stdout
+OK   block 16 (line 357) output == run/08.log stdout
+OK   block 18 (line 401) output == run/09.log stdout
+OK   block 21 (line 434) output == run/11.log stdout
+OK   block 1 (line 50) is a run of whole lines in run/08.log stdout
+OK   21 code blocks in article (found 21)
+ALL OK

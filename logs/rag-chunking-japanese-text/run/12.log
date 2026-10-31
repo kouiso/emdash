@@ -1,0 +1,27 @@
+date: 2026-10-31 13:44:27 +0000
+cwd: /path/to/jp-chunker
+node: v22.22.0
+icu: 77.1
+command: node verify.ts
+exit: 0
+--- stdout+stderr ---
+sections: 5
+  header=26 body=110 total=136 ご利用ガイド > 返品について > 返品できる条件
+  header=24 body=124 total=148 ご利用ガイド > 返品について > 返金の時期
+  header=27 body=104 total=131 ご利用ガイド > 配送について > お届けまでの日数
+  header=22 body=60 total=82 ご利用ガイド > 配送について > 配送料
+  header=16 body=116 total=132 ご利用ガイド > よくある質問
+120/40 last chars: 。 。 。 。 。 。 。 。 。
+  #2 first=23字 overlap=true prevLast=23字
+  #3 first=34字 overlap=false prevLast=28字
+  #4 first=28字 overlap=false prevLast=47字
+  #5 first=26字 overlap=false prevLast=15字
+  #6 first=20字 overlap=true prevLast=20字
+  #7 first=30字 overlap=false prevLast=27字
+  #8 first=32字 overlap=false prevLast=30字
+  #9 first=28字 overlap=true prevLast=28字
+120: total overlap0 = 722 overlap40 = 793 diff = 71
+header chars (with newline): 26 budget at 40: 14
+guard: 上限 20 字が見出しの行より短い: ご利用ガイド > 返品について > 返品できる条件
+fence: [{"headings":["A"],"body":"```bash\n# not a heading\necho hi\n```"}]
+table sentences: ["| 列1 | 列2 |\n","|---|---|\n","| a | b |\n","| c | d |"]

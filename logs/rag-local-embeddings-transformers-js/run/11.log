@@ -1,0 +1,11 @@
+date: 2026-10-31 13:48:36 +0000
+cwd: /path/to/local-embeddings
+node: v22.22.0
+npm: 10.9.4
+command: node search.ts 家に届くまで何日？
+exit: 0
+elapsed: 3185 ms
+--- stdout+stderr ---
+0.859 delivery
+0.836 shipping-fee
+0.835 returns

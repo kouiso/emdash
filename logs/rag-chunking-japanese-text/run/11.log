@@ -1,0 +1,13 @@
+date: 2026-10-31 13:43:50 +0000
+cwd: /path/to/jp-chunker
+node: v22.22.0
+icu: 77.1
+command: node stats.ts
+exit: 0
+--- stdout+stderr ---
+上限	重なり	個数	最長	合計
+80	0	13	80	821
+80	30	14	80	931
+120	0	9	108	722
+120	40	9	108	793
+200	0	5	148	629

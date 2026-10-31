@@ -1,0 +1,11 @@
+date: 2026-10-31 13:48:30 +0000
+cwd: /path/to/local-embeddings
+node: v22.22.0
+npm: 10.9.4
+command: node show-vector.ts 返金はいつ？
+exit: 0
+elapsed: 2317 ms
+--- stdout+stderr ---
+次元数 384
+先頭の3つ [ '0.0815', '-0.0418', '-0.0304' ]
+長さ 1.0000

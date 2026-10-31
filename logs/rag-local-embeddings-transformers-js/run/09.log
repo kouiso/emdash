@@ -1,0 +1,9 @@
+date: 2026-10-31 13:48:30 +0000
+cwd: /path/to/local-embeddings
+node: v22.22.0
+npm: 10.9.4
+command: cp ../code/docs.ts ../code/vector-search.ts ../code/search.ts .
+exit: 0
+elapsed: 6 ms
+--- stdout+stderr ---
+
