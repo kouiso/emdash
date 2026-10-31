@@ -11,7 +11,7 @@ const { siteTitle, siteTagline } = resolveStarterSiteIdentity(
 );
 // JS なしのフォーム送信は /api/subscribe から /?subscribe=<結果>#gift に戻ってくる
 const subscribeStatus = parseSubscribeStatus(Astro.url.searchParams.get("subscribe"));
-const turnstileSiteKey = getTurnstileSiteKey();
+const turnstileSiteKey = getTurnstileSiteKey(Astro.url);
 ---
 
 <Base title={siteTitle} description={siteTagline}>

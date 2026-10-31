@@ -53,14 +53,25 @@ export async function handleSubscribe(request: Request, deps: SubscribeDeps): Pr
 	if (!email) return respond("invalid_email");
 	if (form.get("consent") !== "yes") return respond("consent_required");
 
-	const turnstile = getTurnstileMode();
+	const requestUrl = new URL(request.url);
+	const turnstile = getTurnstileMode(requestUrl);
 	if (turnstile.kind === "misconfigured") {
 		console.error(`[subscribe] Turnstile is half configured: ${turnstile.missing} is not set`);
 		return respond("unavailable");
 	}
+	if (turnstile.kind === "unconfigured") {
+		// 鍵なしで本番に出たときに、ボット対策なしで登録を通さない
+		console.error("[subscribe] Turnstile keys are not set; refusing outside localhost");
+		return respond("unavailable");
+	}
 	if (turnstile.kind === "enabled") {
 		const token = form.get("cf-turnstile-response");
-		const result = await verifyTurnstileToken(turnstile.secret, typeof token === "string" ? token : null, deps.fetchImpl);
+		const result = await verifyTurnstileToken(
+			turnstile.secret,
+			typeof token === "string" ? token : null,
+			requestUrl.hostname,
+			deps.fetchImpl,
+		);
 		if (!result.ok) return respond(result.reason === "unavailable" ? "captcha_unavailable" : "captcha_failed");
 	}
 
