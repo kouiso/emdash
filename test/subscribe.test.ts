@@ -1,12 +1,12 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import { handleSubscribe } from "../src/utils/subscribe-handler";
 import { countSubscribers, createSqliteD1, formRequest } from "./helpers";
-import { resetEnv } from "./stubs/cloudflare-workers";
+import { CONTACT, resetEnv } from "./stubs/cloudflare-workers";
 
 const LOCAL = "http://localhost:8787/api/subscribe";
 
 beforeEach(() => {
-	resetEnv();
+	resetEnv(CONTACT);
 });
 
 describe("handleSubscribe: body size", () => {

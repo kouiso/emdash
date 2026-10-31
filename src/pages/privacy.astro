@@ -1,10 +1,17 @@
 ---
 import Base from "../layouts/Base.astro";
 import { formatDateJa } from "../utils/course";
+import { readEnv } from "../utils/env";
+import { getContactEmail } from "../utils/subscribe-availability";
 import { PRIVACY_POLICY_VERSION } from "../utils/subscribers";
+import { getTurnstileMode } from "../utils/turnstile";
 
 // 版の日付をそのまま施行日として表示する（日本時間の 0 時として解釈する）
 const effectiveDate = formatDateJa(new Date(`${PRIVACY_POLICY_VERSION}T00:00:00+09:00`));
+// 外部サービスは、いまこのサイトで有効なものだけを書く。有効にしたら表示が変わるので PRIVACY_POLICY_VERSION も上げる
+const turnstileEnabled = getTurnstileMode(Astro.url).kind === "enabled";
+const analyticsEnabled = readEnv("PUBLIC_CF_ANALYTICS_TOKEN") !== undefined;
+const contactEmail = getContactEmail();
 ---
 
 <Base
@@ -36,23 +43,47 @@ const effectiveDate = formatDateJa(new Date(`${PRIVACY_POLICY_VERSION}T00:00:00+
 			</ul>
 			<p>これ以外の目的には使いません。第三者への販売や提供もしません。</p>
 
-			<h2>3. 保存場所</h2>
+			<h2>3. 保存場所と、読み書きする人</h2>
 			<p>
-				メールアドレスと日時は、Cloudflare, Inc. のデータベースサービス Cloudflare D1 に保存します。当サイトのサーバー（Cloudflare Workers）だけが読み書きします。
+				メールアドレスと日時は、Cloudflare, Inc. のデータベースサービス Cloudflare D1 に保存します。登録フォームから送られた内容は、当サイトのサーバー（Cloudflare Workers）が書き込みます。
+			</p>
+			<p>
+				当サイトの運営者は、登録の状況を確かめるときと削除の依頼に応じるときに、Cloudflare のコマンドラインツール（wrangler）でこのデータベースを直接読み書きします。運営者以外の人がデータベースを見ることはありません。
+			</p>
+			<p>
+				Cloudflare D1 は、データベースを過去の時点に戻すための履歴（Time Travel）を常に残していて、当サイトが使っている無料プランでは 7 日間保持されます。このため、削除したメールアドレスも、削除から最長 7 日間はこの履歴の中に残ります。
+				<a href="https://developers.cloudflare.com/d1/reference/time-travel/" rel="noopener">Time Travel について（Cloudflare）</a>
 			</p>
 
 			<h2>4. 利用している外部サービス</h2>
 			<dl class="privacy__services">
-				<dt>Cloudflare Turnstile</dt>
+				<dt>Cloudflare Workers と Workers Logs</dt>
 				<dd>
-					登録フォームのボット対策に使っています。フォームを表示したときに、Cloudflare がアクセスの情報を処理して、人による操作かどうかを判定します。
-					<a href="https://www.cloudflare.com/turnstile-privacy-policy/" rel="noopener">Turnstile のプライバシーについて（Cloudflare）</a>
+					当サイトは Cloudflare Workers で動いています。サーバーの動作記録（Workers Logs）を有効にしていて、ページを開くたびに、リクエストと応答の情報（開いた URL、日時、処理の結果など）が Cloudflare のもとに記録され、3 日間保存されます。当サイトは、登録フォームに入力されたメールアドレスをこの記録に書き出していません。
+					<a href="https://developers.cloudflare.com/workers/observability/logs/workers-logs/" rel="noopener">Workers Logs について（Cloudflare）</a>
 				</dd>
-				<dt>Cloudflare Web Analytics</dt>
-				<dd>
-					ページの閲覧数を数えるために使っています。Cloudflare は、Cookie や localStorage を使わず、IP アドレスなどで個人を識別（フィンガープリント）しないと説明しています。
-					<a href="https://www.cloudflare.com/web-analytics/" rel="noopener">Cloudflare Web Analytics</a>
-				</dd>
+				{
+					turnstileEnabled && (
+						<>
+							<dt>Cloudflare Turnstile</dt>
+							<dd>
+								登録フォームのボット対策に使っています。フォームを表示したときに、Cloudflare がアクセスの情報を処理して、人による操作かどうかを判定します。
+								<a href="https://www.cloudflare.com/turnstile-privacy-policy/" rel="noopener">Turnstile のプライバシーについて（Cloudflare）</a>
+							</dd>
+						</>
+					)
+				}
+				{
+					analyticsEnabled && (
+						<>
+							<dt>Cloudflare Web Analytics</dt>
+							<dd>
+								ページの閲覧数を数えるために使っています。Cloudflare は、Cookie や localStorage を使わず、IP アドレスなどで個人を識別（フィンガープリント）しないと説明しています。
+								<a href="https://www.cloudflare.com/web-analytics/" rel="noopener">Cloudflare Web Analytics</a>
+							</dd>
+						</>
+					)
+				}
 				<dt>Google Search Console</dt>
 				<dd>
 					Google 検索での表示回数やクリック数を確認するために使っています。当サイトから Google に訪問者の情報を送るものではなく、Google 検索の集計結果を当サイトの運営者が見るためのサービスです。
@@ -62,11 +93,21 @@ const effectiveDate = formatDateJa(new Date(`${PRIVACY_POLICY_VERSION}T00:00:00+
 
 			<h2>5. 削除の依頼</h2>
 			<p>
-				登録したメールアドレスの削除を希望される場合は、下の連絡先まで、登録したメールアドレスを書いてご連絡ください。確認のうえ、データベースから削除し、削除したことを返信でお知らせします。メルマガの配信を始めたあとは、各メールの配信停止リンクからも停止できるようにします。
+				登録したメールアドレスの削除を希望される場合は、下の「6. お問い合わせ先」まで、登録したメールアドレスを書いてご連絡ください。確認のうえ、運営者がデータベースから削除し、削除したことを返信でお知らせします（「3. 保存場所と、読み書きする人」に書いたとおり、削除後も最長 7 日間は Cloudflare D1 の履歴に残ります）。メルマガの配信を始めたあとは、各メールの配信停止リンクからも停止できるようにします。
 			</p>
 
 			<h2>6. お問い合わせ先</h2>
-			<p>[連絡先]</p>
+			{
+				contactEmail ? (
+					<p>
+						メール: <a href={`mailto:${contactEmail}`}>{contactEmail}</a>
+					</p>
+				) : (
+					<p data-contact-missing>
+						問い合わせ先を準備しています。準備ができるまで、メルマガの登録は受け付けていません。
+					</p>
+				)
+			}
 
 			<h2>7. このポリシーの変更</h2>
 			<p>

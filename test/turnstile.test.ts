@@ -2,14 +2,14 @@ import { beforeEach, describe, expect, it } from "vitest";
 import { handleSubscribe } from "../src/utils/subscribe-handler";
 import { getTurnstileMode, getTurnstileSiteKey, verifyTurnstileToken } from "../src/utils/turnstile";
 import { countSubscribers, createSqliteD1, fakeSiteverify, formRequest } from "./helpers";
-import { resetEnv } from "./stubs/cloudflare-workers";
+import { CONTACT, resetEnv } from "./stubs/cloudflare-workers";
 
 const PROD = "https://ai-eng-blog.kouiso.workers.dev/api/subscribe";
 const SITE_KEY = "1x00000000000000000000AA";
 const SECRET = "1x0000000000000000000000000000000AA";
 
 beforeEach(() => {
-	resetEnv();
+	resetEnv(CONTACT);
 });
 
 describe("getTurnstileMode", () => {
@@ -28,22 +28,22 @@ describe("getTurnstileMode", () => {
 	);
 
 	it("treats blank values as missing", () => {
-		resetEnv({ PUBLIC_TURNSTILE_SITE_KEY: "  ", TURNSTILE_SECRET_KEY: "" });
+		resetEnv({ ...CONTACT, PUBLIC_TURNSTILE_SITE_KEY: "  ", TURNSTILE_SECRET_KEY: "" });
 		expect(getTurnstileMode(new URL(PROD)).kind).toBe("unconfigured");
 	});
 
 	it("is misconfigured with only one key, even on localhost", () => {
-		resetEnv({ PUBLIC_TURNSTILE_SITE_KEY: SITE_KEY });
+		resetEnv({ ...CONTACT, PUBLIC_TURNSTILE_SITE_KEY: SITE_KEY });
 		expect(getTurnstileMode(new URL("http://localhost:8787/"))).toEqual({
 			kind: "misconfigured",
 			missing: "TURNSTILE_SECRET_KEY",
 		});
-		resetEnv({ TURNSTILE_SECRET_KEY: SECRET });
+		resetEnv({ ...CONTACT, TURNSTILE_SECRET_KEY: SECRET });
 		expect(getTurnstileMode(new URL(PROD))).toEqual({ kind: "misconfigured", missing: "PUBLIC_TURNSTILE_SITE_KEY" });
 	});
 
 	it("is enabled with both keys and exposes only the site key", () => {
-		resetEnv({ PUBLIC_TURNSTILE_SITE_KEY: SITE_KEY, TURNSTILE_SECRET_KEY: SECRET });
+		resetEnv({ ...CONTACT, PUBLIC_TURNSTILE_SITE_KEY: SITE_KEY, TURNSTILE_SECRET_KEY: SECRET });
 		expect(getTurnstileMode(new URL(PROD))).toEqual({ kind: "enabled", siteKey: SITE_KEY, secret: SECRET });
 		expect(getTurnstileSiteKey(new URL(PROD))).toBe(SITE_KEY);
 	});
@@ -125,13 +125,13 @@ describe("handleSubscribe with Turnstile", () => {
 	});
 
 	it("refuses with 503 when only one key is set", async () => {
-		resetEnv({ TURNSTILE_SECRET_KEY: SECRET });
+		resetEnv({ ...CONTACT, TURNSTILE_SECRET_KEY: SECRET });
 		const response = await handleSubscribe(formRequest(PROD, fields), { db: createSqliteD1() });
 		expect(response.status).toBe(503);
 	});
 
 	it("verifies against the request hostname and saves on success", async () => {
-		resetEnv({ PUBLIC_TURNSTILE_SITE_KEY: SITE_KEY, TURNSTILE_SECRET_KEY: SECRET });
+		resetEnv({ ...CONTACT, PUBLIC_TURNSTILE_SITE_KEY: SITE_KEY, TURNSTILE_SECRET_KEY: SECRET });
 		const db = createSqliteD1();
 		const siteverify = fakeSiteverify({ success: true, hostname: "ai-eng-blog.kouiso.workers.dev" });
 		const response = await handleSubscribe(formRequest(PROD, fields), { db, fetchImpl: siteverify.impl });
@@ -140,7 +140,7 @@ describe("handleSubscribe with Turnstile", () => {
 	});
 
 	it("returns captcha_failed for a hostname mismatch and captcha_unavailable when siteverify is down", async () => {
-		resetEnv({ PUBLIC_TURNSTILE_SITE_KEY: SITE_KEY, TURNSTILE_SECRET_KEY: SECRET });
+		resetEnv({ ...CONTACT, PUBLIC_TURNSTILE_SITE_KEY: SITE_KEY, TURNSTILE_SECRET_KEY: SECRET });
 		const db = createSqliteD1();
 		const mismatch = await handleSubscribe(formRequest(PROD, fields), {
 			db,

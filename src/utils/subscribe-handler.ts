@@ -1,6 +1,7 @@
 import { normalizeEmail } from "./email";
 import { parseLimitedForm } from "./request-body";
 import { SUBSCRIBE_HTTP_STATUS, SUBSCRIBE_MESSAGES, type SubscribeStatus } from "./subscribe-messages";
+import { getContactEmail } from "./subscribe-availability";
 import { saveSubscriber, type SubscriberDatabase } from "./subscribers";
 import { getTurnstileMode, verifyTurnstileToken } from "./turnstile";
 
@@ -41,6 +42,12 @@ export async function handleSubscribe(request: Request, deps: SubscribeDeps): Pr
 	const origin = request.headers.get("origin");
 	if (origin !== null && origin !== new URL(request.url).origin) {
 		return Response.json({ ok: false, error: "forbidden" }, { status: 403, headers: { "Cache-Control": "no-store" } });
+	}
+
+	// 問い合わせ先が無いあいだは、削除の依頼を受けられないので登録を受け付けない（フォームも閉じている）
+	if (!getContactEmail()) {
+		console.error("[subscribe] PUBLIC_CONTACT_EMAIL is not set; refusing sign-ups");
+		return respond("unavailable");
 	}
 
 	const parsed = await parseLimitedForm(request);

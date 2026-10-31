@@ -10,7 +10,8 @@ export type SubscribeErrorCode =
 export type SubscribeStatus = "ok" | SubscribeErrorCode;
 
 export const SUBSCRIBE_MESSAGES: Record<SubscribeStatus, string> = {
-	ok: "登録を受け付けました。特典はこのメールアドレス宛てにお送りします。",
+	// 特典やメルマガを送る仕組みはまだ無い。送ると約束しない（配信は始めるときにダブルオプトインで確かめる）
+	ok: "登録を受け付けました。メールの配信はまだ始めていません。始めるときは、配信を続けてよいかを確かめるメールを最初に1通お送りします。",
 	invalid_request: "送信内容を読み取れませんでした。ページを再読み込みして、もう一度お試しください。",
 	too_large: "送信内容が大きすぎます。メールアドレスだけを入力して、もう一度お試しください。",
 	invalid_email: "メールアドレスの形式を確認してください。",

@@ -4,14 +4,16 @@ import Base from "../layouts/Base.astro";
 import { COURSE_STEPS } from "../utils/course";
 import { resolveStarterSiteIdentity } from "../utils/site-identity";
 import { SUBSCRIBE_MESSAGES, parseSubscribeStatus } from "../utils/subscribe-messages";
-import { getTurnstileSiteKey } from "../utils/turnstile";
+import { getSubscribeAvailability, SUBSCRIBE_CLOSED_MESSAGES } from "../utils/subscribe-availability";
 
 const { siteTitle, siteTagline } = resolveStarterSiteIdentity(
 	await getSiteSettings(),
 );
 // JS なしのフォーム送信は /api/subscribe から /?subscribe=<結果>#gift に戻ってくる
 const subscribeStatus = parseSubscribeStatus(Astro.url.searchParams.get("subscribe"));
-const turnstileSiteKey = getTurnstileSiteKey(Astro.url);
+const availability = getSubscribeAvailability(Astro.url);
+const turnstileSiteKey = availability.open ? availability.turnstileSiteKey : undefined;
+const closedMessage = availability.open ? null : SUBSCRIBE_CLOSED_MESSAGES[availability.reason];
 ---
 
 <Base title={siteTitle} description={siteTagline}>
@@ -57,7 +59,7 @@ const turnstileSiteKey = getTurnstileSiteKey(Astro.url);
 		<div class="gift__body">
 			<h2 id="gift-title" class="section__title">メルマガ登録特典</h2>
 			<p class="gift__text">
-				実際に動く TypeScript のサンプルアプリ2つと、学習ロードマップをお送りします。
+				メールの配信を始めたら、実際に動く TypeScript のサンプルアプリ2つと、学習ロードマップをお送りします。いまは登録の受け付けだけを行っていて、メールはまだ送っていません。
 			</p>
 			<ul class="gift__list">
 				<li>RAG チャット（検索して答えるチャット）</li>
@@ -66,23 +68,26 @@ const turnstileSiteKey = getTurnstileSiteKey(Astro.url);
 			</ul>
 		</div>
 		<form class="card gift__form" method="post" action="/api/subscribe" data-subscribe-form>
-			<label for="email" class="gift__label">メールアドレス</label>
-			<input
-				id="email"
-				name="email"
-				type="email"
-				required
-				maxlength="254"
-				autocomplete="email"
-				placeholder="you@example.com"
-				class="gift__input"
-			/>
-			<label class="gift__consent">
-				<input type="checkbox" name="consent" value="yes" required />
-				<span><a href="/privacy">プライバシーポリシー</a>に同意して登録する</span>
-			</label>
-			{turnstileSiteKey && <div class="cf-turnstile turnstile-slot" data-sitekey={turnstileSiteKey} data-language="ja" />}
-			<button type="submit" class="gift__submit">特典を受け取る</button>
+			<fieldset class="gift__fields" disabled={closedMessage !== null}>
+				<label for="email" class="gift__label">メールアドレス</label>
+				<input
+					id="email"
+					name="email"
+					type="email"
+					required
+					maxlength="254"
+					autocomplete="email"
+					placeholder="you@example.com"
+					class="gift__input"
+				/>
+				<label class="gift__consent">
+					<input type="checkbox" name="consent" value="yes" required />
+					<span><a href="/privacy">プライバシーポリシー</a>に同意して登録する</span>
+				</label>
+				{turnstileSiteKey && <div class="cf-turnstile turnstile-slot" data-sitekey={turnstileSiteKey} data-language="ja" />}
+				<button type="submit" class="gift__submit">登録する</button>
+			</fieldset>
+			{closedMessage && <p class="gift__status gift__status--error" data-subscribe-closed>{closedMessage}</p>}
 			<p
 				class:list={["gift__status", subscribeStatus && (subscribeStatus === "ok" ? "gift__status--ok" : "gift__status--error")]}
 				role="status"
@@ -147,6 +152,7 @@ const turnstileSiteKey = getTurnstileSiteKey(Astro.url);
 	(function () {
 		var form = document.querySelector("[data-subscribe-form]");
 		if (!form || !window.fetch || !window.FormData) return;
+		if (form.querySelector("[data-subscribe-closed]")) return;
 		var status = form.querySelector("[data-subscribe-status]");
 		var button = form.querySelector("button[type=submit]");
 		function show(ok, message) {
@@ -307,6 +313,18 @@ const turnstileSiteKey = getTurnstileSiteKey(Astro.url);
 		display: flex;
 		flex-direction: column;
 		gap: 12px;
+	}
+	.gift__fields {
+		margin: 0;
+		padding: 0;
+		border: 0;
+		min-width: 0;
+		display: flex;
+		flex-direction: column;
+		gap: 12px;
+	}
+	.gift__fields:disabled {
+		opacity: 0.6;
 	}
 	.gift__label {
 		font-weight: 600;
