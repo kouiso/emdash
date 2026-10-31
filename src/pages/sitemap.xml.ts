@@ -1,7 +1,13 @@
 import type { APIRoute } from "astro";
-import { getEmDashCollection } from "emdash";
-import { siteUrlFor } from "../utils/site-origin";
-import { escapeXml, xmlResponse } from "../utils/sitemap";
+import { getEmDashCollection, getSeoMeta } from "emdash";
+import { getSiteOrigin, siteUrlFor } from "../utils/site-origin";
+import {
+	collectionSitemapPaths,
+	countListedEntries,
+	escapeXml,
+	sitemapUnavailable,
+	xmlResponse,
+} from "../utils/sitemap";
 
 export const prerender = false;
 
@@ -10,33 +16,33 @@ export const prerender = false;
 // サイト側で書いたページは含まない（https://docs.emdashcms.com/guides/seo/ 2026-10-31 確認）。
 // そこでインデックスだけを差し替え、組み込みの子サイトマップと /static-sitemap.xml を並べる。
 const COLLECTIONS = ["posts", "pages"] as const;
-// 組み込みの子サイトマップは1ファイル 2,000 件まで。超えた分は -2, -3 … に続く（同ドキュメント）
-const ENTRIES_PER_SITEMAP = 2000;
-
-async function collectionSitemapPaths(collection: string): Promise<string[]> {
-	const paths: string[] = [];
-	// offset で各ファイルの先頭に1件でもあるかを見て、ページ数を数える。
-	// 公開済みが0件のコレクションは組み込みの子サイトマップが 404 を返すので載せない
-	for (let page = 1; ; page++) {
-		const { entries } = await getEmDashCollection(collection, {
-			status: "published",
-			limit: 1,
-			offset: ENTRIES_PER_SITEMAP * (page - 1),
-		});
-		if (entries.length === 0) break;
-		paths.push(page === 1 ? `/sitemap-${collection}.xml` : `/sitemap-${collection}-${page}.xml`);
-	}
-	return paths;
-}
+const PAGE_SIZE = 500;
 
 export const GET: APIRoute = async ({ url }) => {
+	const siteUrl = getSiteOrigin(url);
 	const paths = ["/static-sitemap.xml"];
-	for (const collection of COLLECTIONS) {
-		paths.push(...(await collectionSitemapPaths(collection)));
+	try {
+		for (const collection of COLLECTIONS) {
+			const count = await countListedEntries(async (cursor) => {
+				const result = await getEmDashCollection(collection, { status: "published", limit: PAGE_SIZE, cursor });
+				return {
+					error: result.error,
+					nextCursor: result.nextCursor,
+					hasMore: result.hasMore,
+					items: result.entries.map((entry) => ({
+						slug: entry.data.slug,
+						robots: getSeoMeta(entry, { siteTitle: "", siteUrl, path: `/${entry.id}` }).robots,
+					})),
+				};
+			});
+			paths.push(...collectionSitemapPaths(collection, count));
+		}
+	} catch (error) {
+		// エラーのまま件数を 0 と数えると、記事があるのに子サイトマップが消えたインデックスを 1 時間キャッシュさせてしまう
+		console.error("[sitemap] failed to count entries", error);
+		return sitemapUnavailable();
 	}
-	const items = paths
-		.map((path) => `\t<sitemap><loc>${escapeXml(siteUrlFor(path, url))}</loc></sitemap>`)
-		.join("\n");
+	const items = paths.map((path) => `\t<sitemap><loc>${escapeXml(siteUrlFor(path, url))}</loc></sitemap>`).join("\n");
 	return xmlResponse(
 		`<?xml version="1.0" encoding="UTF-8"?>\n<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${items}\n</sitemapindex>\n`,
 	);

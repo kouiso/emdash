@@ -1,7 +1,7 @@
 import type { APIRoute } from "astro";
 import { getTaxonomyTerms } from "emdash";
 import { siteUrlFor } from "../utils/site-origin";
-import { escapeXml, xmlResponse } from "../utils/sitemap";
+import { escapeXml, sitemapUnavailable, xmlResponse } from "../utils/sitemap";
 
 export const prerender = false;
 
@@ -16,7 +16,15 @@ function flatten(terms: Term[]): Term[] {
 }
 
 export const GET: APIRoute = async ({ url }) => {
-	const [tags, categories] = await Promise.all([getTaxonomyTerms("tag"), getTaxonomyTerms("category")]);
+	let tags: Term[];
+	let categories: Term[];
+	try {
+		// getTaxonomyTerms は結果にエラーを入れず、DB の失敗では投げる（https://docs.emdashcms.com/reference/api/ 2026-10-31 確認）
+		[tags, categories] = await Promise.all([getTaxonomyTerms("tag"), getTaxonomyTerms("category")]);
+	} catch (error) {
+		console.error("[sitemap] failed to read taxonomy terms", error);
+		return sitemapUnavailable();
+	}
 	const paths = [
 		...FIXED_PATHS,
 		...flatten(tags).map((t) => `/tag/${encodeURIComponent(t.slug)}`),
