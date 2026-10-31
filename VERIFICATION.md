@@ -68,7 +68,7 @@ later authorized deployment.
 ### ローカルで通したもの（Node 22.22.0、wrangler 4.152.0、emdash 1.4.0）
 
 - `npm test`（vitest 5.0.5）: 8 ファイル、99 件が通った。メールアドレスの検証、本文の 16 KiB の上限（chunked を含む）、Turnstile のモード（localhost だけ素通し）と hostname の照合、D1 への保存（テーブルが無いときだけ作る）、問い合わせ先が無いときに受け付けないこと、サイトの URL、サイトマップの件数を見ている。
-- `npm run typecheck`: 0 errors。`npm run build`: 成功。`npx wrangler deploy --dry-run`: `Total Upload: 16066.60 KiB / gzip: 4257.05 KiB`、`env.EMDASH_SITE_URL ("https://ai-eng-blog.kouiso.workers.dev")`。生成された `dist/server/wrangler.json` に `"preview_urls":false` が入っている。
+- `npm run typecheck`: 0 errors。`npm run build`: 成功。`npx wrangler deploy --dry-run`: `Total Upload: 16066.86 KiB / gzip: 4256.61 KiB`、`env.EMDASH_SITE_URL ("https://ai-eng-blog.kouiso.workers.dev")`。生成された `dist/server/wrangler.json` に `"preview_urls":false` が入っている。
 - `npx wrangler dev --local`（`--persist-to` でスクラッチパッドに分けた DB。終わったら止めて消した）を `curl` と Playwright（Chromium）で確かめた。
   - `vars` のまま起動: `Host: evil.example` で開いても canonical、og:url、sitemap の `<loc>` は `https://ai-eng-blog.kouiso.workers.dev/...`。問い合わせ先が無いのでフォームは無効で理由が出て、POST は 503。`/privacy` に `[連絡先]` は無く、Turnstile と Web Analytics の項目は出ない。
   - `--var EMDASH_SITE_URL:http://localhost:8787 --var PUBLIC_CONTACT_EMAIL:owner@example.test`: 最初の登録でテーブルが作られて 200、2件目と同じアドレスの再登録も 200。1 MB の本文は `Content-Length` 付きでも chunked でも 413、15 KB は 200。`=HYPERLINK(...)@a.b`、`<img>@a.b`、`a@b..c`、U+202E、NUL はすべて `invalid_email`。`Host: ai-eng-blog.kouiso.workers.dev` でキーなしの POST は 503。JS を切ったフォーム送信は 303 で `/?subscribe=ok#gift`。
