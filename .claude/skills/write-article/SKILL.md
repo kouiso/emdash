@@ -25,6 +25,27 @@ description: ブログ記事を1本、キーワード選びから EmDash への�
 3. 書いている途中で `03-anti-ai.md`、`04-collocation.md`、`05-technical-writing.md` を引く
 4. `keywords/README.md`（CSV の置き場所と列）
 
+pack はどれも Read ツールで読めます。`vendor/` の下に置くと、執筆に使う環境の Read 禁止ルール `Read(./**/vendor/**)` で読めなくなるので、`docs/tech-writing-pack/` から動かしません。
+
+### ゲートの項目はガイドを読んでから判定する
+
+公開前ゲートの各項目は、その項目が指すガイドを Read ツールで読んでから判定します。ガイドを読まずに判定した項目は、根拠が何であっても NG と数えます。lint の結果、スキルの要約、記憶、別の場所にある写しは、ガイドを読んだことの代わりになりません。
+
+| 項目 | 判定の前に読むガイド |
+|---|---|
+| C01〜C04 | `guides/01-seo-for-dev-blogs.md`（C04 は記事型のテンプレートとして `guides/02-article-structures.md` も読む） |
+| C05〜C08 | `guides/02-article-structures.md` |
+| C09〜C19、C30〜C32 | `guides/03-anti-ai.md` |
+| C20〜C24 | `guides/04-collocation.md` |
+| C25〜C29 | `guides/05-technical-writing.md` |
+| C33〜C36、G01 | `guides/03-anti-ai.md` の「引用（mention）と使用（use）の区別」 |
+| G02 | `guides/09-ai-writing-manual.md`（§2 の機械チェック）と、DENSITY の上限の正本 `guides/08-ai-buntai-ruleset.md` |
+| C37〜C39 | `guides/03-anti-ai.md`（5つの不在）と `guides/06-rewriting-prompts.md` の「使い方の流れ」4 |
+
+- `gate.md` の冒頭に、読んだガイドのファイル名と読んだ日を書く。各行の根拠には、照らし合わせたガイドの節を書く（例「guides/05 §1 文の長さ」）。
+- ガイドが読めないとき（権限、パスの誤りなど）は、その項目を NG にして止め、読めない理由を報告する。読めないまま lint や要約で OK にしない。
+- 判定のために補助のスクリプトを書くときも、checklist とガイドに無い除外を入れない（例 C25 の文字数を数えるときに、インラインコードを1字に縮める、表やリストを飛ばす）。除外しないと通らない文は、除外せずに直す。
+
 ### 読者
 
 AI 組み込み開発、つまり「自分のアプリに LLM を組み込む開発」を学びたい人です。組み込みシステム（エッジ AI）の話は扱いません。
@@ -49,9 +70,10 @@ AI 組み込み開発、つまり「自分のアプリに LLM を組み込む開
 
 ### 記事の必須条件（どの記事にも入れる）
 
-- 一次情報の URL とアクセス日
+- 一次情報の URL とアクセス日を、本文に書く。frontmatter の `sources` は記事ページに出ないので、本文の末尾に出典の表（題名、URL、確認日）を置き、断定した文から番号で引く
 - コピーして実行すれば動くコード。Claude が実際に動かしたもの
-- 料金の目安。API を呼ぶ記事は、公式の料金ページの URL とアクセス日を添えて金額の目安を書く。API を呼ばない記事は、API の料金がかからないことを書く
+- 料金の目安。API を呼ぶ記事は、公式の料金ページの URL とアクセス日を添えて金額の目安を書く。API を呼ばない記事は、記事の手順のうちどこまでが無料で、どこから料金や有料のアカウントが要るか（例 Claude Code を使う操作）を出典付きで書く。実行していない操作まで「無料」と書かない
+- frontmatter の `cost_estimate`（料金の目安）、`run_environment`（動かした環境）、`verified_at`（コードを最後に実行した日）を埋める。記事ページでは、前の2つがタイトルの下の枠に、`verified_at` が公開日の横に「動作確認日」として出る（README の「記事の任意フィールド」）
 - 文体はですます調で統一する（checklist の C19・C29 を満たすため、サイト全体で揃える）
 - 言語は TypeScript を基本にする（特典のサンプルアプリと揃える）
 
@@ -61,7 +83,7 @@ AI 組み込み開発、つまり「自分のアプリに LLM を組み込む開
 
 ### 1. キーワードを選ぶ
 
-1. `keywords/` にある CSV をすべて読む。CSV が1つも無ければ、その時点で止めて「CSV 待ち」と報告する。
+1. `keywords/` にある CSV をすべて読む。CSV が1つも無ければ、その時点で止めて「CSV 待ち」と報告する。ユーザーが CSV なしで書き進めるよう明示したときだけ先へ進めるが、その記事は `target_query: null`、ゲート G10 は NG、`status: draft` のままにする。CSV に無いキーワードを `target_query`、`brief.md`、`selection.md` に作って書かない。
 2. 候補の絞り込みは次の順で行う。
    1. 既存記事と重ならないこと。`content/articles/*.md` の frontmatter（`title`、`main_keyword`、`target_query`）を全件読み、同じ検索意図に答える記事が既にある語は外す。表記ゆれ（「LLM API 使い方」と「LLM API 使い方 初心者」など）は同じ意図とみなす。
    2. `ANTHROPIC_API_KEY` の有無。`test -n "$ANTHROPIC_API_KEY" && echo set || echo unset` で確かめる（値そのものは表示しない、ログにも残さない）。`unset` のあいだは、API を呼ばずに書けるテーマ（MCP サーバー、zod での検証、RAG の検索部分など）を先に選ぶ。API を呼ぶ記事を書いた場合、その記事はゲートで下書き止まりになる。
@@ -181,7 +203,7 @@ writing-lint.py の FATAL のうち個人名の検出は、スクリプトの `P
 
 1. `logs/<slug>/gate.md` と lint の出力を読み直す。`status: ready` 以外は投稿しない。
 2. 公開日を決める。1日1本。`content/articles/*.md` の `publish_at` で最も遅い日の翌日と、今日の翌日の、遅いほうにする。時刻は毎日同じにし、最初の記事で決めた時刻を README に書いて以後それに揃える。
-3. EmDash の MCP（`/_emdash/api/mcp`、OAuth 2.1）で `posts` に記事を作り、予約公開にする。`posts` コレクションは `seed/seed.json` で `drafts`、`revisions`、`preview`、`scheduling` を持っていて、予約公開の実行は Worker の scheduled handler と毎分の cron（`wrangler.jsonc`）が担う。作成は `content_create`（`collection:"posts"`、`slug`、`data:{title, excerpt, content}`。既定で draft になる。`content` には Markdown の文字列をそのまま渡せば Portable Text に変換される）、予約は `content_get` で `_rev` を取ってから `content_schedule`（未来の ISO 8601。`+09:00` 付きでよい）で行う。`content_publish` は予約を消してすぐ公開するので、予約した記事には使わない。返った ULID の `id` を `publish.md` に記録する。根拠はローカルでの検証記録 `docs/verification/local-mcp.md`（2026-10-31）。予約時刻を過ぎた記事は Cron Trigger で scheduled handler が動いた時点で公開される。本番の Cron が実際に動くことは、deploy 後に確かめる。
+3. EmDash の MCP（`/_emdash/api/mcp`、OAuth 2.1）で `posts` に記事を作り、予約公開にする。`posts` コレクションは `seed/seed.json` で `drafts`、`revisions`、`preview`、`scheduling` を持っていて、予約公開の実行は Worker の scheduled handler と毎分の cron（`wrangler.jsonc`）が担う。作成は `content_create`（`collection:"posts"`、`slug`、`data:{title, excerpt, content, cost_estimate, run_environment, verified_at}`。既定で draft になる。`content` には Markdown の文字列をそのまま渡せば Portable Text に変換される）、予約は `content_get` で `_rev` を取ってから `content_schedule`（未来の ISO 8601。`+09:00` 付きでよい）で行う。`content_publish` は予約を消してすぐ公開するので、予約した記事には使わない。返った ULID の `id` を `publish.md` に記録する。根拠はローカルでの検証記録 `docs/verification/local-mcp.md`（2026-10-31）。予約時刻を過ぎた記事は Cron Trigger で scheduled handler が動いた時点で公開される。本番の Cron が実際に動くことは、deploy 後に確かめる。
    - タグは、`content_create` より先に term を揃えてから渡す。frontmatter の `tags` は `tag` タクソノミーの term の slug に直し、`taxonomies:{tag:[<slug>, …]}` で渡す。まず `taxonomy_list_terms`（`taxonomy:"tag"`）で既存の term を読み、`label` がタグと同じ term の `slug` を使う。無いタグは `taxonomy_create_term`（`taxonomy:"tag"`、`label` はタグそのまま、`slug` は英小文字・数字・ハイフン）で先に作る。無い slug を渡すと、`content_create` は `isError:true`、`[VALIDATION_ERROR] Unknown taxonomy term` を返すのに、下書きはもうできている。EmDash 1.4.0 は記事を書いたあとで term を引き、D1 ではトランザクションが効かないので、記事の行が残る（`docs/verification/local-mcp.md` の #22〜#28）。
    - `content_create` が `isError:true` を返したら、作り直す前に `content_get`（`id` に slug）を呼ぶ。`[NOT_FOUND]` なら原因を直して作り直す。下書きが返ったら作り直さない（同じ slug は `[SLUG_CONFLICT]` になる）。その ULID を `publish.md` に記録し、足りなかった分を `content_get` → `content_update`（`_rev` と `taxonomies` など）で足す。
 4. MCP で予約公開ができなかったときは、記事を下書きとして投稿しておき、Claude Code の scheduled task で毎日1本ずつ公開する。scheduled task のプロンプトには「`publish_at` が今日の記事を1本だけ公開し、`publish.md` に記録する」と書く。
@@ -204,11 +226,12 @@ writing-lint.py の FATAL のうち個人名の検出は、スクリプトの `P
 | G02 | `writing-lint.py` の判定行が `### 判定: FATAL 0 / DENSITY超過 0 / SHOULD n` の形で、FATAL と DENSITY超過がどちらも 0。SHOULD、WATCH（出たときだけ）、INFO(要人間確認) は1件ずつ判断を記録した。この FATAL 0 では個人名を検出できない（`PERSONAL_NAMES` が空）ので、個人名は G09 で確かめる | `lint/writing-lint.txt`、`lint/judgments.md` |
 | G03 | 下の B の全項目を満たす | `gate.md` |
 | G04 | 記事のコードを記事の形のまま実際に動かし、ログがある。API を呼ぶ記事で `ANTHROPIC_API_KEY` が無いときは不合格 | `code/`、`run/` |
-| G05 | 断定した事実すべてに一次情報の出典（URL とアクセス日）がある。料金の目安がある（API を呼ぶ記事は出典付きの金額、呼ばない記事は料金がかからないこと） | `sources.md`、frontmatter `sources` |
+| G05 | 断定した事実すべてに一次情報の出典（URL とアクセス日）があり、それが本文に出ている（frontmatter の `sources` だけでは不合格）。料金の目安がある（API を呼ぶ記事は出典付きの金額、呼ばない記事は無料の範囲と、有料になる操作）。frontmatter の `cost_estimate`、`run_environment`、`verified_at` が埋まっていて、`run_environment` と `verified_at` が `run/` のログと一致する | 原稿の出典の表、`sources.md`、frontmatter |
 | G06 | 既存記事と検索意図が重ならない | `selection.md` |
 | G07 | 講座の前後リンク（`prev`、`next` のうち存在するもの）と、既存記事が3本以上なら関連記事への内部リンクが本文にある。リンク先は公開済みか先に予約済み | `gate.md` にリンク先の slug を列挙 |
 | G08 | 本文の最後の段落が「AI 支援で執筆」を含む決まった表記になっている | 原稿の末尾 |
 | G09 | 原稿、ログ、frontmatter に秘密情報（API キー、トークン、パスワード）が無い。原稿に個人名（ユーザーや関係者の名前）が無い | `gate.md` に確かめ方を書く。個人名は手順7のとおり `grep -n` で0件を確かめる |
+| G10 | `target_query` が `keywords/*.csv` のどれかの行のキーワードと1文字も違わない。CSV が無いとき、`target_query` が null のとき、CSV に無い値のときは不合格（「CSV 待ち」）。値を作って合格にしない | `selection.md` に読んだ CSV のファイル名と、一致した行があることを書く（行や数値は写さない） |
 
 ### B. checklist.md の全項目（原文のまま）
 
@@ -269,6 +292,9 @@ tags: ["RAG", "TypeScript"]
 main_keyword: "RAG"
 target_query: "rag 検索 仕組み typescript"
 course_step: 3
+cost_estimate: "API を呼ばないので無料（npm の依存のインストールだけ）"
+run_environment: "Node.js 22.22.0、TypeScript 7.0.2"
+verified_at: "2026-10-30"
 prev: "structured-output-zod"   # 講座で1つ前の記事の slug。無ければ null
 next: null                      # 講座で1つ後の記事の slug。まだ無ければ null
 sources:
@@ -290,8 +316,11 @@ updated: 2026-10-30             # 最後に原稿を直した日
 | `description` | 必須 | リード文の要約。lint の対象になる |
 | `tags` | 必須 | メインキーワードを1つ目に入れる |
 | `main_keyword` | 必須 | 講座の表の6語のどれか |
-| `target_query` | 必須 | 選んだ CSV の行のキーワードをそのまま |
+| `target_query` | 必須（CSV が無いときだけ null） | 選んだ CSV の行のキーワードをそのまま。CSV が無ければ null にし、G10 を NG にする。CSV に無い語を作って入れない |
 | `course_step` | 必須 | 1〜6。講座の表の番号 |
+| `cost_estimate` | 必須 | 料金の目安を1文で。API を呼ぶ記事は出典付きの金額、呼ばない記事は無料の範囲と有料になる操作。本文の料金の記述と食い違わせない |
+| `run_environment` | 必須 | コードを動かした環境。`run/` のログにあるランタイムと主要パッケージのバージョン（例「Node.js 22.22.0、TypeScript 7.0.2」） |
+| `verified_at` | 必須 | コードを最後に実行した日（`YYYY-MM-DD`）。`run/` の最後のログの日付と、末尾の「AI 支援で執筆」の日付にそろえる |
 | `prev` / `next` | 必須（値は null 可） | 講座の順番で前後にある記事の slug。同じ `course_step` の中は公開順で並べる |
 | `sources` | 必須（1件以上） | `url`、`title`、`accessed`（YYYY-MM-DD）。`sources.md` と一致させる |
 | `ai_assisted` | 必須 | 常に `true` |
@@ -300,7 +329,7 @@ updated: 2026-10-30             # 最後に原稿を直した日
 | `publish_at` | 予約後に必須 | 1日1本になるように入れる |
 | `updated` | 必須 | 直すたびに更新する |
 
-EmDash の `posts` は今のところ `title`、`featured_image`、`content`（Portable Text）、`excerpt` と、タクソノミー `category`、`tag` を持っています（`seed/seed.json`）。`title` は `title` に、`description` は `excerpt` に、本文は `content` に、`tags` は `tag` に入れます。`course_step`、`prev`、`next`、`sources` に当たるフィールドは今のスキーマに無いので、前後リンクと出典は本文に書いたものが読者に見える形になります。専用のフィールドを足すか、`seo` の欄に何を入れるかは、「実装時にドキュメントで確認する」項目です。
+EmDash の `posts` は `title`、`featured_image`、`content`（Portable Text）、`excerpt`、`cost_estimate`、`run_environment`、`verified_at` と、タクソノミー `category`、`tag` を持っています（`seed/seed.json`、README の「記事の任意フィールド」）。`title` は `title` に、`description` は `excerpt` に、本文は `content` に、`tags` は `tag` に、`cost_estimate`、`run_environment`、`verified_at` は同じ名前のフィールドに入れます。`course_step`、`prev`、`next`、`sources` に当たるフィールドは今のスキーマに無いので、前後リンクと出典は本文に書いたものが読者に見える形になります。専用のフィールドを足すか、`seo` の欄に何を入れるかは、「実装時にドキュメントで確認する」項目です。
 
 ## logs/<slug>/ の中身
 
@@ -342,6 +371,7 @@ logs/<slug>/
 
 - `keywords/` に CSV が無い、または CSV の列が `keywords/README.md` の想定と違って読めない
 - 公開前ゲートのどれかに落ちた（下書きで止める）
+- ゲートの項目が指すガイドを読めない（その項目は NG）
 - コードを実行できなかった（権限、ネットワーク、API キー）
 - 一次情報が見つからず、出典の無い断定が残る
 - EmDash の MCP に接続できない（原稿は `ready` のまま残し、メインエージェントが接続を回復してから投稿する）
