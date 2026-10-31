@@ -1,0 +1,8 @@
+date: 2026-10-31 09:26:49 +0000
+cwd: /path/to/bm25-search
+node: v22.22.0
+icu: 77.1
+command: node show-tokens.ts 使える支払い方法
+exit: 0
+--- stdout+stderr ---
+[ '使える', '支払い', '方法' ]

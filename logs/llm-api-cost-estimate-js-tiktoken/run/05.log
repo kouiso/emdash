@@ -1,0 +1,10 @@
+# run 05
+date: 2026-10-31T08:54:27+00:00
+cwd: /path/to/work/token-cost-estimate
+node: v22.22.0
+npm: 10.9.4
+command: node unknown-model.ts
+exit: 0
+--- stdout+stderr ---
+gpt-5-mini: 1 token
+gpt-5.6-terra: Unknown model

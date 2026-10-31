@@ -1,0 +1,25 @@
+date: 2026-10-31T09:12:13+00:00
+cwd: (作業フォルダ zod-llm-check)
+node: v22.22.0 / npm: 10.9.4
+note: 記事には載せない確認。ネットワークの無い名前空間（unshare -rn）で、記事の node コマンドを全部実行し直す
+command: unshare -rn ./offline-all.sh
+----- stdout+stderr -----
+## node check.ts ok
+exit=0
+## node check.ts wrong-type
+exit=0
+## node check.ts bad-enum
+exit=0
+## node check.ts extra-key
+exit=0
+## node check.ts many
+exit=0
+## node retry-message.ts
+exit=0
+## node pretty-ja.ts
+exit=0
+## node strip.ts
+exit=0
+## outbound fetch
+EAI_AGAIN
+----- exit=0 -----

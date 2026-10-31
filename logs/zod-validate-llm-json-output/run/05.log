@@ -1,0 +1,13 @@
+date: 2026-10-31T09:12:07+00:00
+cwd: (作業フォルダ zod-llm-check)
+node: v22.22.0 / npm: 10.9.4
+note: 見本 ok
+command: node check.ts ok
+----- stdout+stderr -----
+success: {
+  category: 'bug',
+  priority: 2,
+  summary: 'ログインボタンを押しても反応しない',
+  tags: [ 'login', 'ui' ]
+}
+----- exit=0 -----

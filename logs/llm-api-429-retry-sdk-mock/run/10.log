@@ -1,0 +1,10 @@
+date: 2026-10-31T08:55:44+00:00
+cwd: (作業フォルダ retry-mock)
+node: v22.22.0 / npm: 10.9.4
+note: extra/err-name.ts（記事には載せない）。BadRequestError の err.name を確かめる
+command: node err-name.ts
+----- stdout+stderr -----
+err.name: Error
+err.constructor.name: BadRequestError
+instanceof BadRequestError: true
+----- exit=0 -----

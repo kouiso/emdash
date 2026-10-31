@@ -1,0 +1,12 @@
+date: 2026-10-31 09:10:42 +0000
+cwd: /path/to/zod-tool-schema
+node: v22.22.0
+npm: 10.9.4
+command: node src/check-input.ts
+exit: 0
+--- stdout+stderr ---
+ok: { email: 'user@example.com', status: 'shipped', limit: 10 }
+ng: [
+  'status: Invalid option: expected one of "pending"|"shipped"|"cancelled"',
+  'limit: Too big: expected number to be <=50'
+]

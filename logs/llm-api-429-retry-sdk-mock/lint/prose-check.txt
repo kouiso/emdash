@@ -1,0 +1,8 @@
+sentences: 188 (prose+frontmatter 130, headings 15, table cells 43)
+not counted: code block lines 165, URL-only table cells 8 (lines [389, 390, 391, 392, 393, 394, 395, 396])
+LONG>60: 0  (50<len<=60: 23)
+prose length min 12 / max 59 / short(<=20) 11 / long(41-60) 51
+SAME3: 0
+PAT 'まとめ' 165 500 以上はまとめて `InternalServerError` なので、529 もこのクラスになります（出典5）。
+AND/OR candidates (や in prose, judge by eye):
+  YA 361 通信量を少しずつ増やすよう勧めています（出典

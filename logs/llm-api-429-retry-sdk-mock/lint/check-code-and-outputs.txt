@@ -1,0 +1,22 @@
+code package.json: True
+code server.ts: True
+code client.ts: True
+code my-loop.ts: True
+output 02 npm install: True
+output 04-08 client outputs: True
+output 03 server log (without my-loop): True
+output 03 server log (my-loop only): True
+output 09 node my-loop.ts: True
+run 01 exit=0
+run 02 exit=0
+run 03 exit=130
+run 04 exit=0
+run 05 exit=0
+run 06 exit=0
+run 07 exit=0
+run 08 exit=0
+run 09 exit=0
+run 10 exit=0
+run 11 exit=0
+run 12 exit=0
+ALL OK

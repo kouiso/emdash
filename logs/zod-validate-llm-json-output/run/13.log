@@ -1,0 +1,9 @@
+date: 2026-10-31T09:12:09+00:00
+cwd: (作業フォルダ zod-llm-check)
+node: v22.22.0 / npm: 10.9.4
+note: 記事には載せない確認。Node.js の型ストリップは型を調べないので、@types/node（22 系）を入れて tsc 7.0.2 で型を調べる（--no-save で package.json は変えない）
+command: npm install --no-save typescript@7.0.2 @types/node@22.20.5 >/dev/null 2>&1; npx tsc -v; npx tsc -p tsconfig.typecheck.json; echo tsc_exit=$?
+----- stdout+stderr -----
+Version 7.0.2
+tsc_exit=0
+----- exit=0 -----

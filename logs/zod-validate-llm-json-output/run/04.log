@@ -1,0 +1,13 @@
+date: 2026-10-31T09:12:07+00:00
+cwd: (作業フォルダ zod-llm-check)
+node: v22.22.0 / npm: 10.9.4
+note: スキーマと見本の節。schema.ts、samples.ts、check.ts を置く（cp）
+command: cp (code)/schema.ts (code)/samples.ts (code)/check.ts . && ls
+----- stdout+stderr -----
+check.ts
+node_modules
+package-lock.json
+package.json
+samples.ts
+schema.ts
+----- exit=0 -----

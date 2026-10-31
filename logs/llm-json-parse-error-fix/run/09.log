@@ -1,0 +1,9 @@
+date: 2026-10-31T09:29:42Z
+cwd: <work>/llm-json-parse
+node: v22.22.0 / npm: 10.9.4
+command: node <code>/extra/edge-brace.ts
+--- output (stdout+stderr) ---
+切り出した範囲: "{\"category\": 文字列} です。\n{\"category\": \"billing\", \"priority\": 1}"
+SyntaxError: Unexpected token '文', ..."ategory": 文字列} です。
+{"... is not valid JSON
+--- exit=0

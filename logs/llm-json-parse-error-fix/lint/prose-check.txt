@@ -1,0 +1,35 @@
+units=149 excluded_url_only_cells=6
+C25 over60=0 max=60
+C16 prose sentences=93 min=6 max=60 le20=7 41to60=50
+C17 SAME3(3字)=0 []
+C17 SAME3(2字・参考)=0 []
+C19 non-desumasu prose=0
+PAT bold **: 0
+PAT em-dash —: 0
+PAT 罫線 ─: 0
+PAT ― U+2015: 0
+PAT 全角コロン ：: 0
+PAT 全角スラッシュ ／: 0
+PAT 徹底解説: 0
+PAT 完全ガイド: 0
+PAT でしょう: 0
+PAT かもしれ: 0
+PAT ここから: 0
+PAT ここまで: 0
+PAT 次は: 0
+PAT まとめ: 0
+PAT 整理: 0
+PAT 見ていき: 0
+PAT 解説します: 0
+PAT 紹介します: 0
+PAT ではなく: 0
+PAT ではありません: 0
+PAT じゃない: 0
+PAT や（並列候補）: 0
+PAT さまざま: 0
+PAT 落ちる: 1
+    (2, 'title: "LLM の返した JSON が JSON.parse で落ちる原因と直し方【コードフ')
+PAT 効く: 0
+PAT 回す: 0
+PAT 仕様書: 0
+PAT 地図: 0

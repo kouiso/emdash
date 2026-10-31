@@ -1,0 +1,14 @@
+date: 2026-10-31 09:10:41 +0000
+cwd: /path/to/zod-tool-schema
+node: v22.22.0
+npm: 10.9.4
+command: npm install
+exit: 0
+--- stdout+stderr ---
+
+added 13 packages, and audited 14 packages in 3s
+
+1 package is looking for funding
+  run `npm fund` for details
+
+found 0 vulnerabilities

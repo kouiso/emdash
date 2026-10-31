@@ -1,0 +1,8 @@
+date: 2026-10-31T08:55:08+00:00
+cwd: (作業フォルダ retry-mock)
+node: v22.22.0 / npm: 10.9.4
+note: ターミナル2。シナリオ spend-cap
+command: node client.ts spend-cap
+----- stdout+stderr -----
+spend cap (1333ms): 来月まで待つか上限を上げる
+----- exit=0 -----

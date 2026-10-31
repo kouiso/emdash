@@ -1,0 +1,10 @@
+# run 03
+date: 2026-10-31T08:54:17+00:00
+cwd: /path/to/work/token-cost-estimate
+node: v22.22.0
+npm: 10.9.4
+command: node count.ts
+exit: 0
+--- stdout+stderr ---
+10 tokens / 45 chars: Summarize this support ticket in three lines.
+12 tokens / 24 chars: このお問い合わせの内容を3行で要約してください。

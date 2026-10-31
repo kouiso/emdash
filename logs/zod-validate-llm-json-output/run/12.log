@@ -1,0 +1,8 @@
+date: 2026-10-31T09:12:09+00:00
+cwd: (作業フォルダ zod-llm-check)
+node: v22.22.0 / npm: 10.9.4
+note: z.object の節。strip.ts を置いて実行（cp）
+command: cp (code)/strip.ts . && node strip.ts
+----- stdout+stderr -----
+true { category: 'billing', priority: 1, summary: '請求額が二重になっている', tags: [] }
+----- exit=0 -----

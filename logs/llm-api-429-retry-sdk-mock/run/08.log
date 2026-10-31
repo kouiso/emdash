@@ -1,0 +1,8 @@
+date: 2026-10-31T08:55:10+00:00
+cwd: (作業フォルダ retry-mock)
+node: v22.22.0 / npm: 10.9.4
+note: ターミナル2。シナリオ long-wait
+command: node client.ts long-wait
+----- stdout+stderr -----
+APIUserAbortError (10003ms): status=undefined type=null
+----- exit=0 -----

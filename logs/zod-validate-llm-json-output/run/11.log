@@ -1,0 +1,13 @@
+date: 2026-10-31T09:12:09+00:00
+cwd: (作業フォルダ zod-llm-check)
+node: v22.22.0 / npm: 10.9.4
+note: 日本語のメッセージの節。pretty-ja.ts を置いて実行（cp）
+command: cp (code)/pretty-ja.ts . && node pretty-ja.ts
+----- stdout+stderr -----
+✖ 大きすぎる値: numberは3以下である必要があります
+  → at priority
+✖ 無効な入力: stringが期待されましたが、undefinedが入力されました
+  → at summary
+✖ 無効な入力: stringが期待されましたが、数値が入力されました
+  → at tags[1]
+----- exit=0 -----

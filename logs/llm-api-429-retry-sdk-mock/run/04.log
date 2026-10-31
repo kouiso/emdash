@@ -1,0 +1,8 @@
+date: 2026-10-31T08:55:04+00:00
+cwd: (作業フォルダ retry-mock)
+node: v22.22.0 / npm: 10.9.4
+note: ターミナル2。シナリオ rate-limit
+command: node client.ts rate-limit
+----- stdout+stderr -----
+ok (2070ms): { type: 'text', text: 'mock: ok' }
+----- exit=0 -----

@@ -1,0 +1,5 @@
+{
+  "name": "bm25-search",
+  "private": true,
+  "type": "module"
+}

@@ -1,0 +1,10 @@
+date: 2026-10-31 09:10:42 +0000
+cwd: /path/to/zod-tool-schema
+node: v22.22.0
+npm: 10.9.4
+command: node src/compare-io.ts
+exit: 0
+--- stdout+stderr ---
+output:       [ 'email', 'status', 'limit' ] false
+input:        [ 'email', 'status' ] undefined
+strict input: [ 'email', 'status' ] false

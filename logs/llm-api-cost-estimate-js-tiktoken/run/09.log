@@ -1,0 +1,16 @@
+# run 09
+date: 2026-10-31T08:59:31+00:00
+cwd: /path/to/work/token-cost-estimate
+node: v22.22.0
+npm: 10.9.4
+command: unshare -rn bash -c 'node -e "fetch(\"https://registry.npmjs.org/\").then(()=>console.log(\"network: reachable\")).catch(e=>console.log(\"network: unreachable\", e.cause?.code ?? e.message))"; node count.ts; node estimate.ts; node unknown-model.ts'
+exit: 0
+--- stdout+stderr ---
+network: unreachable EAI_AGAIN
+10 tokens / 45 chars: Summarize this support ticket in three lines.
+12 tokens / 24 chars: このお問い合わせの内容を3行で要約してください。
+入力 93 / 出力上限 1000 トークン: 1回 $0.012186、1日1,000回で30日 $365.58
+入力 93 / 出力上限 25000 トークン: 1回 $0.300186、1日1,000回で30日 $9005.58
+入力 279000 / 出力上限 1000 トークン: 1回 $1.134000、1日1,000回で30日 $34020.00
+gpt-5-mini: 1 token
+gpt-5.6-terra: Unknown model

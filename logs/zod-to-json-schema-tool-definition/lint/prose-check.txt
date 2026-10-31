@@ -1,0 +1,12 @@
+sentences: 215 (prose+frontmatter 152, headings 13, table cells 50)
+not counted: code block lines 172, URL-only table cells 12 (lines [429, 430, 431, 432, 433, 434, 435, 436, 437, 438, 439, 440])
+LONG>60: 1  (50<len<=60: 41)
+LONG 2 fm 61 zod のスキーマから JSON Schema を作ってツール定義に使う【zod v4 の z.toJSONSchema】
+prose length min 13 / max 61 / short(<=20) 7 / long(41-60) 80
+SAME3: 0
+PAT '約' 378 prose `limit` の `min(1)` と `max(50)` は、strict のツールでは使えない制約です。
+PAT '約' 419 prose strict を付けると入力の形は保証されますが、`limit` の上限のような数の制約はスキーマに書けません。
+PAT 'など' 382 prose `z.date()`、`z.bigint()` などは JSON Schema で表せない型です（出典1）。
+PAT 'など' 425 prose 本文の（出典1）などの番号は、この表の番号を指します。
+AND/OR candidates (や in prose, judge by eye):
+  YA 72 2025年11月で保守をやめたと書いています（出典

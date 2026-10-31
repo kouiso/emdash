@@ -1,0 +1,8 @@
+date: 2026-10-31 09:10:37 +0000
+cwd: /path/to/art-zod-to-json-schema-tool-definition
+node: v22.22.0
+npm: 10.9.4
+command: mkdir -p zod-tool-schema/src
+exit: 0
+--- stdout+stderr ---
+

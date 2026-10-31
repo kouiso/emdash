@@ -1,0 +1,9 @@
+date: 2026-10-31 09:10:43 +0000
+cwd: /path/to/zod-tool-schema
+node: v22.22.0
+npm: 10.9.4
+command: node src/date-error.ts
+exit: 0
+--- stdout+stderr ---
+error: Date cannot be represented in JSON Schema
+fixed: string date

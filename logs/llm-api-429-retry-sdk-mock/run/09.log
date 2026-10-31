@@ -1,0 +1,10 @@
+date: 2026-10-31T08:55:20+00:00
+cwd: (作業フォルダ retry-mock)
+node: v22.22.0 / npm: 10.9.4
+note: ターミナル2。自前の3回ループ（変更前のコード）
+command: node my-loop.ts
+----- stdout+stderr -----
+attempt 1 failed: 529 {"type":"error","error":{"type":"overloaded_error","message":"mock: overloaded"},"request_id":"req_mock"}
+attempt 2 failed: 529 {"type":"error","error":{"type":"overloaded_error","message":"mock: overloaded"},"request_id":"req_mock"}
+attempt 3 failed: 529 {"type":"error","error":{"type":"overloaded_error","message":"mock: overloaded"},"request_id":"req_mock"}
+----- exit=0 -----

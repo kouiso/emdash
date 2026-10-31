@@ -1,0 +1,6 @@
+date: 2026-10-31T09:27:59Z
+cwd: <scratch>/tsc（typescript 7.0.2 と @types/node 22.20.5 を入れた別フォルダ。記事の手順には含まない）
+node: v22.22.0 / npm: 10.9.4 / tsc: Version 7.0.2
+command: npx tsc -p <code>/extra/tsconfig.typecheck.json
+--- output (stdout+stderr) ---
+--- exit=0

@@ -1,0 +1,8 @@
+# run 01
+date: 2026-10-31T08:54:16+00:00
+cwd: /path/to/work
+node: v22.22.0
+npm: 10.9.4
+command: mkdir token-cost-estimate
+exit: 0
+--- stdout+stderr ---

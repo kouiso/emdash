@@ -1,0 +1,21 @@
+# run 08
+date: 2026-10-31T08:56:19+00:00
+cwd: /path/to/notype
+node: v22.22.0
+npm: 10.9.4
+command: cat package.json && node count.ts
+exit: 0
+--- stdout+stderr ---
+{
+  "name": "notype",
+  "private": true,
+  "dependencies": {
+    "js-tiktoken": "1.0.21"
+  }
+}
+10 tokens / 45 chars: Summarize this support ticket in three lines.
+12 tokens / 24 chars: このお問い合わせの内容を3行で要約してください。
+(node:5169) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///path/to/notype/count.ts is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to /path/to/notype/package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)

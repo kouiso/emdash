@@ -1,0 +1,9 @@
+# run 07
+date: 2026-10-31T08:54:52+00:00
+cwd: /path/to/work/token-cost-estimate
+node: v22.22.0
+npm: 10.9.4
+command: npx --yes -p typescript@5.9.3 tsc --noEmit --strict --target es2022 --module nodenext --moduleResolution nodenext --lib es2022,dom --skipLibCheck count.ts estimate.ts unknown-model.ts && echo typecheck-ok
+exit: 0
+--- stdout+stderr ---
+typecheck-ok

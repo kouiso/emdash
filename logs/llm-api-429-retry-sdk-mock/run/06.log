@@ -1,0 +1,8 @@
+date: 2026-10-31T08:55:08+00:00
+cwd: (作業フォルダ retry-mock)
+node: v22.22.0 / npm: 10.9.4
+note: ターミナル2。シナリオ bad-request
+command: node client.ts bad-request
+----- stdout+stderr -----
+BadRequestError (63ms): status=400 type=invalid_request_error
+----- exit=0 -----

@@ -1,0 +1,36 @@
+date: 2026-10-31 09:27:12 +0000
+cwd: /path/to/bm25-search
+node: v22.22.0
+icu: 77.1
+command: node extra/explain.ts 返品できる期間は？ 使える支払い方法 返金はいつ？ 返品 パスワードを忘れた
+exit: 0
+--- stdout+stderr ---
+## 返品できる期間は？ -> 返品 | できる | 期間 | は
+returns 返品(tf=2,df=2) できる(tf=1,df=1) は(tf=2,df=8) len=22
+cancel は(tf=1,df=8) len=19
+payment は(tf=1,df=8) len=11
+shipping-fee は(tf=2,df=8) len=18
+delivery は(tf=2,df=8) len=20
+password は(tf=1,df=8) len=22
+login は(tf=1,df=8) len=24
+points 返品(tf=3,df=2) は(tf=7,df=8) len=83
+## 使える支払い方法 -> 使える | 支払い | 方法
+payment 支払い(tf=1,df=2) 方法(tf=1,df=1) len=11
+points 支払い(tf=1,df=2) len=83
+## 返金はいつ？ -> 返金 | は | いつ
+returns は(tf=2,df=8) len=22
+cancel は(tf=1,df=8) len=19
+payment は(tf=1,df=8) len=11
+shipping-fee は(tf=2,df=8) len=18
+delivery は(tf=2,df=8) len=20
+password は(tf=1,df=8) len=22
+login は(tf=1,df=8) len=24
+points は(tf=7,df=8) len=83
+## 返品 -> 返品
+returns 返品(tf=2,df=2) len=22
+points 返品(tf=3,df=2) len=83
+## パスワードを忘れた -> パスワード | を | 忘れ | た
+cancel を(tf=1,df=4) len=19
+password パスワード(tf=2,df=1) を(tf=2,df=4) 忘れ(tf=1,df=1) た(tf=1,df=2) len=22
+login を(tf=1,df=4) len=24
+points を(tf=2,df=4) た(tf=1,df=2) len=83

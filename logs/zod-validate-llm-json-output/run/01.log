@@ -1,0 +1,7 @@
+date: 2026-10-31T09:12:06+00:00
+cwd: (作業フォルダ work)
+node: v22.22.0 / npm: 10.9.4
+note: 記事の準備の節。作業フォルダを作る（記事の cd zod-llm-check は、ロガーの外のシェルで実行した）
+command: mkdir zod-llm-check
+----- stdout+stderr -----
+----- exit=0 -----

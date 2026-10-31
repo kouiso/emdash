@@ -1,0 +1,10 @@
+date: 2026-10-31 09:26:49 +0000
+cwd: /path/to/bm25-search
+node: v22.22.0
+icu: 77.1
+command: node search.ts 返品できる期間は？
+exit: 0
+--- stdout+stderr ---
+1.771 returns
+0.677 points
+0.040 shipping-fee

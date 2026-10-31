@@ -1,0 +1,29 @@
+date: 2026-10-31T09:12:08+00:00
+cwd: (作業フォルダ zod-llm-check)
+node: v22.22.0 / npm: 10.9.4
+note: 見本 many
+command: node check.ts many
+----- stdout+stderr -----
+[
+  {
+    origin: 'number',
+    code: 'too_big',
+    maximum: 3,
+    inclusive: true,
+    path: [ 'priority' ],
+    message: 'Too big: expected number to be <=3'
+  },
+  {
+    expected: 'string',
+    code: 'invalid_type',
+    path: [ 'summary' ],
+    message: 'Invalid input: expected string, received undefined'
+  },
+  {
+    expected: 'string',
+    code: 'invalid_type',
+    path: [ 'tags', 1 ],
+    message: 'Invalid input: expected string, received number'
+  }
+]
+----- exit=0 -----
