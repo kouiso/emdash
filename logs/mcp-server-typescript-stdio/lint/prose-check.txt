@@ -1,10 +1,7 @@
-sentences: 107
-PAT 'ません。' 54 読み終えた人は、自分で決めた処理を MCP のツールとして公開できます。SDK のクライアントで呼び、結果を確かめるところまで手元で完結します。LLM の AP
-PAT 'ません。' 71 Node.js は 22.22.0 で動かしました。作り終えたときの作業フォルダは次の形になります。`dist/` と `node_modules/` は、ビル
-PAT 'ません。' 89 stdio 方式では、クライアント（Claude Code など）がサーバーを子プロセスとして起動します。やり取りは標準入出力を通る JSON-RPC です（M
-PAT 'ません。' 186 `inputSchema` には zod のスキーマを書きます。SDK は zod を必須の peer dependency にしています（v1.x の REA
-PAT 'ません。' 194 Claude Code につなぐ前に、SDK のクライアントでサーバーを起動してツールを直接呼びます。LLM を通さないため、API キーも料金も要りません。`
-PAT 'ません。' 304 この結果を見て、stdout に書いても平気だと考えるのは危険です。仕様に反した出力をクライアントがどう扱うかは、クライアントの実装しだいです。しかも `cli
-PAT 'ません。' 346 `claude mcp list` の `√ Connected` は、Claude Code がサーバーを起動して接続できた印です。登録後のセッションでは、`
-PAT 'ません。' 350 この記事のコードは LLM の API を一度も呼ばないので、API の料金はかかりません。SDK のクライアントで確かめる方法なら、API キーが無くても開発
-PAT '**' 130   "include": ["src/**/*.ts"]
+sentences: 219 (prose+frontmatter 147, headings 13, table cells 59)
+not counted: code block lines 153, URL-only table cells 15 (lines [410, 411, 412, 413, 414, 415, 416, 417, 418, 419, 420, 421, 422, 423, 424])
+LONG>60: 0  (50<len<=60: 34)
+prose length min 13 / max 60 / short(<=20) 8 / long(41-60) 78
+SAME3: 0
+PAT '言語モデル' 81 MCP サーバーは、LLM（大規模言語モデル）が呼べるツールを公開するプログラムです（出典2）。
+AND/OR candidates (や in prose, judge by eye):

@@ -1,0 +1,13 @@
+code package.json: True
+code tsconfig.json: True
+code src/server.ts: True
+code src/check.ts: True
+code compare.mjs: True
+output 13 npm install: True
+output 14 npm run check: True
+output 15 node compare.mjs: True
+output 17 npm run check (console.log): True
+output 20 claude mcp add/list/get/remove: True
+output lead ok line (14): True
+19 (reverted) check output == 14: True
+ALL OK
