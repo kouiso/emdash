@@ -11,11 +11,11 @@ const HEIGHT = 630;
 const FONT_SIZE = 60;
 const LINE_HEIGHT = 84;
 const MAX_LINES = 4;
-// 全角文字を1、半角を0.55として数え、1行に入る幅を決める（60px の文字で左右に 80px の余白が残る幅）
+// 全角文字を1、ASCII の半角を0.55として数え、1行に入る幅を決める（60px の文字で左右に 80px の余白が残る幅）
 const MAX_LINE_UNITS = 17;
 
 function charUnits(char: string): number {
-	return /[\u0000-ÿ]/.test(char) ? 0.55 : 1;
+	return /[\x20-\x7e]/.test(char) ? 0.55 : 1;
 }
 
 /** 日本語は単語の区切りが無いので、1文字ずつ幅を足して折り返す */
