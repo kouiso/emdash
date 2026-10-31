@@ -1,0 +1,31 @@
+date: 2026-10-31T04:47:28+00:00
+node: v22.22.0 / claude: 2.1.314 (Claude Code)
+note: 使い捨ての HOME と CLAUDE_CONFIG_DIR で実行。出力中の作業フォルダの絶対パスは /path/to/char-count-mcp に置き換えた
+command: claude mcp add char-count --scope user --transport stdio -- node /path/to/char-count-mcp/dist/server.js
+----- stdout+stderr -----
+Added stdio MCP server char-count with command: node /path/to/char-count-mcp/dist/server.js to user config
+File modified: /path/to/tmp-home/.claude/.claude.json
+----- exit=0 -----
+command: claude mcp list
+----- stdout+stderr -----
+Checking MCP server health…
+
+char-count: node /path/to/char-count-mcp/dist/server.js - √ Connected
+----- exit=0 -----
+command: claude mcp get char-count
+----- stdout+stderr -----
+char-count:
+  Scope: User config (available in all your projects)
+  Status: √ Connected
+  Type: stdio
+  Command: node
+  Args: /path/to/char-count-mcp/dist/server.js
+  Environment:
+
+To remove this server, run: claude mcp remove char-count -s user
+----- exit=0 -----
+command: claude mcp remove char-count -s user
+----- stdout+stderr -----
+Removed MCP server char-count from user config
+File modified: /path/to/tmp-home/.claude/.claude.json
+----- exit=0 -----

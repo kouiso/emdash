@@ -34,6 +34,26 @@ npx wrangler dev --local
 
 ローカルでの動作確認は、下の「ユーザーにしかできないこと」が済んでいなくても Claude が自分で行います。
 
+## 記事の任意フィールド
+
+記事（`posts`）には、本文とは別に次の3つのフィールドがあります。どれも入力しなければ記事ページに出ません。
+
+| フィールド | 管理画面の表示名 | 型 | 記事ページでの出方 |
+|---|---|---|---|
+| `cost_estimate` | 料金の目安 | `string` | タイトルの下の枠に「料金の目安」として出る |
+| `run_environment` | 動かした環境 | `string` | 同じ枠に「動かした環境」として出る |
+| `verified_at` | 動作確認日（YYYY-MM-DD） | `string`（`YYYY-MM-DD` の形か空欄だけ受け付ける） | 公開日の横に「動作確認日 2026年10月30日」の形で出る |
+
+管理画面で動作確認日の欄を消して保存すると、空の文字列 `""` が送られます。検証の正規表現を `^(\d{4}-\d{2}-\d{2})?$` にして空の文字列も通しているのは、そのときに保存全体が 400 で失敗しないようにするためです。記事ページは空の値を未入力として扱います。
+
+動作確認日を `datetime` にしていないのは、EmDash の `datetime` が時刻付きの瞬間を UTC で保存する型で、暦の日付には `string` を使うようドキュメントに書かれているためです（https://docs.emdashcms.com/reference/field-types/ 、2026-10-31 確認）。
+
+フィールドの定義は `seed/seed.json` にあります。seed が使われるのは、空の DB でセットアップ画面を終える前の最初の1回だけです。すでにセットアップを済ませた DB（ローカルの `.wrangler/` を含む）には、seed を変えても追加されません。その場合は管理画面の Content Types から足すか、`npx emdash schema add-field posts cost_estimate --type string --label "料金の目安" --url <サイトの URL>` のように CLI で足します（https://docs.emdashcms.com/deployment/schema-evolution/ 、2026-10-31 確認）。`emdash-env.d.ts` は `npm run dev` を起動したときに、ローカルの DB のスキーマから作り直されます（https://docs.emdashcms.com/reference/cli/ の「Generated files」）。
+
+## OGP 画像
+
+記事の OGP 画像は、SEO パネルの OG Image があればそれを使い、無ければ `/og/posts/<slug>.svg` でタイトルから作る SVG を使います。X や Facebook は SVG を表示しないので、SNS に画像を出したい記事は OG Image に PNG か JPEG を設定します。Worker の中で PNG に変換しない理由は、測った値とあわせて [docs/decisions/ogp.md](./docs/decisions/ogp.md) にあります。
+
 ## ユーザーにしかできないこと
 
 どれもアカウントの持ち主の操作、ブラウザでのログイン、ユーザー自身の判断のどれかが要る作業です。Claude はこのリポジトリの中から代わりに実行できません。
@@ -94,7 +114,7 @@ PoC の目的は、自動化した執筆と公開が役に立つかを判断す�
   - R2 `emdash-trial-20261021-media`（バインディング `MEDIA`）
   - KV `emdash-trial-20261021-session`（Astro 標準の `SESSION`）
 - Worker `emdash-trial-20261021` は作成も deploy もされていません。静的アセットは Workers Assets（`ASSETS`）で配る設定です。
-- リポジトリ名、`package.json` の `name`、Worker 名は、まだ旧名（`emdash`、`emdash-trial`、`emdash-trial-20261021`）のままです。
+- リポジトリ名と Worker 名は、まだ旧名（`emdash`、`emdash-trial-20261021`）のままです。`package.json` と `package-lock.json` の `name` は `ai-eng-blog` に揃えました。
 - Access、LOADER、AI、メール、独自 DNS、有料 CI は追加していません。フォントは OS 標準、画像変換は無効です。
 - ローカルでのビルド、型チェック、`wrangler deploy --dry-run` は 2026-10-25 に通っています（VERIFICATION.md）。
 

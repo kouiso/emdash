@@ -1,0 +1,8 @@
+--- src/server.ts	2026-10-31 04:45:55.394361215 +0000
++++ src/server.ts (console.log 版)	2026-10-31 04:46:28.864870472 +0000
+@@ -25,4 +25,4 @@
+ );
+ 
+ await server.connect(new StdioServerTransport());
+-console.error("char-count MCP server started (stdio)");
++console.log("char-count MCP server started (stdio)");

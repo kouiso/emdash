@@ -41,6 +41,23 @@ const toc = buildToc(post.data.content);
 const { publishedAt, updatedAt } = post.data;
 const showUpdated =
 	publishedAt && formatDateJa(updatedAt) !== formatDateJa(publishedAt);
+// 料金の目安・動かした環境・動作確認日は任意のフィールド。空白だけの値は未入力として扱い、出さない
+const costEstimate = post.data.cost_estimate?.trim() || null;
+const runEnvironment = post.data.run_environment?.trim() || null;
+const verifiedAt = post.data.verified_at?.trim() || null;
+const verifiedAtLabel = verifiedAt ? formatIsoDateJa(verifiedAt) : null;
+
+/** 動作確認日は時刻を持たない暦日（YYYY-MM-DD の文字列）。実在しない日付なら null を返し、入力をそのまま出す */
+function formatIsoDateJa(value: string): string | null {
+	const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value);
+	if (!m) return null;
+	const [year, month, day] = [Number(m[1]), Number(m[2]), Number(m[3])];
+	// Date.UTC は 0〜99 年を 1900 年代に読み替えるので、setUTCFullYear で年をそのまま入れる
+	const date = new Date(0);
+	date.setUTCFullYear(year, month - 1, day);
+	if (date.getUTCFullYear() !== year || date.getUTCMonth() !== month - 1 || date.getUTCDate() !== day) return null;
+	return `${year}年${month}月${day}日`;
+}
 // SEO パネルにも記事にも画像が無いときは、タイトルから作る OGP 画像を使う
 const ogImage =
 	seo.ogImage ?? new URL(`/og/posts/${encodeURIComponent(slug)}.svg`, Astro.url.origin).href;
@@ -71,16 +88,45 @@ const articleMeta = {
 			{course && <p class="eyebrow article__eyebrow">入門ステップ講座 {course.step.no} / {course.step.name}</p>}
 			<h1 class="article__title" {...post.edit.title}>{post.data.title}</h1>
 			{
-				publishedAt && (
+				(publishedAt || verifiedAt) && (
 					<p class="article__meta">
-						公開 <time datetime={publishedAt.toISOString()}>{formatDateJa(publishedAt)}</time>
-						{showUpdated && (
+						{publishedAt && (
+							<>
+								公開 <time datetime={publishedAt.toISOString()}>{formatDateJa(publishedAt)}</time>
+							</>
+						)}
+						{publishedAt && showUpdated && (
 							<>
 								{" ・ 更新 "}
 								<time datetime={updatedAt.toISOString()}>{formatDateJa(updatedAt)}</time>
 							</>
 						)}
+						{verifiedAt && (
+							<span class="article__verified" data-verified-at>
+								{publishedAt ? " ・ " : ""}動作確認日{" "}
+								<time datetime={verifiedAtLabel ? verifiedAt : undefined}>{verifiedAtLabel ?? verifiedAt}</time>
+							</span>
+						)}
 					</p>
+				)
+			}
+
+			{
+				(costEstimate || runEnvironment) && (
+					<dl class="cost-box" data-cost-box>
+						{costEstimate && (
+							<div class="cost-box__row">
+								<dt>料金の目安</dt>
+								<dd>{costEstimate}</dd>
+							</div>
+						)}
+						{runEnvironment && (
+							<div class="cost-box__row">
+								<dt>動かした環境</dt>
+								<dd>{runEnvironment}</dd>
+							</div>
+						)}
+					</dl>
 				)
 			}
 
@@ -192,6 +238,32 @@ const articleMeta = {
 		margin: 0;
 		font-size: 13px;
 		color: var(--muted);
+	}
+	.cost-box {
+		margin: 0;
+		padding: 16px 20px;
+		background: var(--accent-soft);
+		border-radius: 8px;
+		display: flex;
+		flex-direction: column;
+		gap: 8px;
+		font-size: 14px;
+		line-height: 1.7;
+	}
+	.cost-box__row {
+		display: flex;
+		flex-wrap: wrap;
+		column-gap: 16px;
+	}
+	.cost-box dt {
+		flex: 0 0 7em;
+		font-weight: 700;
+	}
+	.cost-box dd {
+		flex: 1 1 16em;
+		margin: 0;
+		min-width: 0;
+		overflow-wrap: anywhere;
 	}
 	.article__image :global(img) {
 		display: block;

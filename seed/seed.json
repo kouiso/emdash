@@ -40,6 +40,24 @@
 					"slug": "excerpt",
 					"label": "Excerpt",
 					"type": "text"
+				},
+				{
+					"slug": "cost_estimate",
+					"label": "料金の目安",
+					"type": "string"
+				},
+				{
+					"slug": "run_environment",
+					"label": "動かした環境",
+					"type": "string"
+				},
+				{
+					"slug": "verified_at",
+					"label": "動作確認日（YYYY-MM-DD）",
+					"type": "string",
+					"validation": {
+						"pattern": "^(\\d{4}-\\d{2}-\\d{2})?$"
+					}
 				}
 			]
 		},
