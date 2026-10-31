@@ -8,7 +8,7 @@ Claude 向けの運用ルールは [CLAUDE.md](./CLAUDE.md)、EmDash のコー�
 
 | 部分 | 中身 |
 |---|---|
-| CMS | [EmDash](https://github.com/emdash-cms/emdash) 1.3.1（Astro 製。MCP サーバーを内蔵） |
+| CMS | [EmDash](https://github.com/emdash-cms/emdash) 1.4.0（Astro 製。MCP サーバーを内蔵。版を上げた経緯は [docs/decisions/emdash-version.md](./docs/decisions/emdash-version.md)） |
 | フレームワーク | Astro 7.3.2、`@astrojs/cloudflare` 14.3.1 |
 | 実行環境 | Cloudflare Workers |
 | データ | D1（記事などの DB）、R2（画像）、KV（セッション） |

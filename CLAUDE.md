@@ -52,7 +52,7 @@ EmDash 自体の書き方（サーバーレンダリング必須、画像フィ�
 
 ## サイトと Cloudflare のルール
 
-- 依存の版は `package.json` と `package-lock.json` で固定しています。`emdash` と `@emdash-cms/cloudflare` は 1.3.1 です。版を上げるときは記事の作業と混ぜず、`npm run build` と `npm run typecheck` が通ることを確かめてから入れます。
+- 依存の版は `package.json` と `package-lock.json` で固定しています。`emdash` と `@emdash-cms/cloudflare` は 1.4.0 です（1.3.1 から上げた理由と確かめた結果は [docs/decisions/emdash-version.md](./docs/decisions/emdash-version.md)）。版を上げるときは記事の作業と混ぜず、`npm run build` と `npm run typecheck` が通ることを確かめてから入れます。
 - パッケージマネージャーは npm です（ロックファイルが `package-lock.json` のため）。AGENTS.md の `pnpm dev` は upstream の starter の文面で、このリポジトリでは `npm run dev` が同じ動作です。ローカルで動かす手順は [README.md](./README.md) にあります。
 - 動作確認の正式な経路は、README と VERIFICATION.md と同じ `npm run build` のあとの `npx wrangler dev --local` です。Playwright などで確かめるのは `http://localhost:8787/` と `http://localhost:8787/_emdash/admin` です。`npm run dev`（`astro dev`。AGENTS.md の記載では管理画面は `http://localhost:4321/_emdash/admin`）は、画面を直しながら見るときにだけ使い、その結果を動作確認として報告しません。
 - Cloudflare の無料枠に収めます。サンドボックスで動くプラグインは使わないので、`sandboxRunner` と `LOADER` は設定に入れません。有料プランが要る機能かどうかは、deploy の前にドキュメントで確かめます。最初は `*.workers.dev` のドメインで動かします。
