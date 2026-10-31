@@ -1,12 +1,12 @@
 import { describe, expect, it } from "vitest";
 import { collectionSitemapPaths, countListedEntries, ENTRIES_PER_SITEMAP, type SitemapPage } from "../src/utils/sitemap";
 
-const listed = { slug: "a", robots: null };
+const listed = { slug: "a", hidden: false };
 
 describe("countListedEntries", () => {
 	it("skips entries without a slug and entries hidden from search engines", async () => {
 		const count = await countListedEntries(async () => ({
-			items: [listed, { slug: null, robots: null }, { slug: "b", robots: "noindex, nofollow" }, { slug: "c", robots: "index" }],
+			items: [listed, { slug: null, hidden: false }, { slug: "b", hidden: true }, { slug: "c", hidden: false }],
 		}));
 		expect(count).toBe(2);
 	});

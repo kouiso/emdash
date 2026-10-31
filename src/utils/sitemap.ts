@@ -22,8 +22,8 @@ export const ENTRIES_PER_SITEMAP = 2000;
 /** サイトマップに載るかどうかの判定に使う、エントリ1件分の値 */
 export interface SitemapCandidate {
 	slug: string | null;
-	/** getSeoMeta() の robots。「検索エンジンに表示しない」にした記事は noindex を含む */
-	robots: string | null;
+	/** SEO パネルの「検索エンジンに表示しない」が付いている */
+	hidden: boolean;
 }
 
 export interface SitemapPage {
@@ -44,7 +44,7 @@ export async function countListedEntries(fetchPage: (cursor: string | undefined)
 	for (;;) {
 		const page = await fetchPage(cursor);
 		if (page.error) throw page.error instanceof Error ? page.error : new Error(String(page.error));
-		count += page.items.filter((item) => Boolean(item.slug) && !/\bnoindex\b/i.test(item.robots ?? "")).length;
+		count += page.items.filter((item) => Boolean(item.slug) && !item.hidden).length;
 		if (!page.hasMore || !page.nextCursor || page.nextCursor === cursor) break;
 		cursor = page.nextCursor;
 	}
