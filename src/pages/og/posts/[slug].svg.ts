@@ -12,7 +12,7 @@ const FONT_SIZE = 60;
 const LINE_HEIGHT = 84;
 const MAX_LINES = 4;
 // 全角文字を1、ASCII の半角を0.55として数え、1行に入る幅を決める（60px の文字で左右に 80px の余白が残る幅）
-const MAX_LINE_UNITS = 17;
+const MAX_LINE_UNITS = 16;
 
 function charUnits(char: string): number {
 	return /[\x20-\x7e]/.test(char) ? 0.55 : 1;

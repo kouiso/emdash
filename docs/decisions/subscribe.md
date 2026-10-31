@@ -46,7 +46,7 @@ IP アドレスは保存しない。プライバシーポリシー（`/privacy`�
 - `Accept: application/json` のとき（トップの JS からの送信）は JSON を返す: `{ "ok": true, "message": "…" }` または `{ "ok": false, "error": "<コード>", "message": "…" }`。
 - それ以外（JS が動かない通常のフォーム送信）は `303` で `/?subscribe=<コード>#gift` に戻し、トップがフォームの下に結果を出す。
 - エラーのコード: `invalid_request` / `invalid_email` / `consent_required` / `captcha_failed`（400）、`captcha_unavailable` / `unavailable`（503）。
-- 別サイトからのフォーム送信は、Astro の `security.checkOrigin`（server 出力では既定で有効）が 403 で止める。
+- 別サイトからのフォーム送信は、ルート自身が `Origin` ヘッダーを見て 403 で止める。Astro の `security.checkOrigin` に任せる予定だったが、2026-10-31 に `npx wrangler dev --local` で `Origin: https://evil.example` の POST を送ったところ保存まで通ったので、ルートで確かめるようにした。`Origin` を付けないクライアント（curl など）は通る。そこから守るのは本番の Turnstile。
 
 ## Turnstile の扱い
 

@@ -29,6 +29,13 @@ export const POST: APIRoute = async ({ request }) => {
 		});
 	};
 
+	// 別サイトに置いたフォームから他人のアドレスを登録させないよう、ブラウザが付ける Origin を確かめる。
+	// このプロジェクトの設定では Astro の checkOrigin がこのルートの別オリジン POST を止めなかった（2026-10-31 実測）
+	const origin = request.headers.get("origin");
+	if (origin !== null && origin !== new URL(request.url).origin) {
+		return Response.json({ ok: false, error: "forbidden" }, { status: 403, headers: { "Cache-Control": "no-store" } });
+	}
+
 	let form: FormData;
 	try {
 		form = await request.formData();

@@ -13,16 +13,17 @@ const COLLECTIONS = ["posts", "pages"] as const;
 const ENTRIES_PER_SITEMAP = 2000;
 
 async function collectionSitemapPaths(collection: string): Promise<string[]> {
-	const paths = [`/sitemap-${collection}.xml`];
-	// offset で次のファイルの先頭に1件でもあるかを見て、ページ数を数える
-	for (let page = 2; ; page++) {
+	const paths: string[] = [];
+	// offset で各ファイルの先頭に1件でもあるかを見て、ページ数を数える。
+	// 公開済みが0件のコレクションは組み込みの子サイトマップが 404 を返すので載せない
+	for (let page = 1; ; page++) {
 		const { entries } = await getEmDashCollection(collection, {
 			status: "published",
 			limit: 1,
 			offset: ENTRIES_PER_SITEMAP * (page - 1),
 		});
 		if (entries.length === 0) break;
-		paths.push(`/sitemap-${collection}-${page}.xml`);
+		paths.push(page === 1 ? `/sitemap-${collection}.xml` : `/sitemap-${collection}-${page}.xml`);
 	}
 	return paths;
 }
