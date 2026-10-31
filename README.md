@@ -56,6 +56,15 @@ npx wrangler dev --local
 
 記事の OGP 画像は、SEO パネルの OG Image があればそれを使い、無ければ `/og/posts/<slug>.svg` でタイトルから作る SVG を使います。X や Facebook は SVG を表示しないので、SNS に画像を出したい記事は OG Image に PNG か JPEG を設定します。Worker の中で PNG に変換しない理由は、測った値とあわせて [docs/decisions/ogp.md](./docs/decisions/ogp.md) にあります。
 
+## 無料枠に収まるか
+
+Workers の無料枠では、Worker のサイズは圧縮前で 64 MiB まで、CPU 時間は1回の呼び出しで 10 ms までです。10 ms の上限は HTTP リクエストだけでなく Cron Trigger にもかかります（https://developers.cloudflare.com/workers/platform/limits/ 、2026-10-31 確認）。
+
+- サイズ: `npx wrangler deploy --outdir bundled/ --dry-run` の結果は `Total Upload: 16062.39 KiB / gzip: 4255.24 KiB` でした。圧縮前 15.69 MiB で、上限の約 25% です（2026-10-31、emdash 1.4.0）。`bundled/` は `.gitignore` 済みです。
+- CPU 時間: ローカルでは測れません。deploy のあと、全ページを巡回して Error 1102（Worker exceeded resource limits）が出ないこと、ダッシュボードの Metrics → Errors の呼び出しの状態に Exceeded resources が無いこと、Settings → Trigger Events で毎分の cron が成功していることを Claude が確かめます。
+
+測り方と本番で確かめる手順の詳細は [docs/verification/free-tier.md](./docs/verification/free-tier.md) にあります。
+
 ## 本番に deploy する（持ち主の作業）
 
 Cloudflare のダッシュボードでの操作と、パスキーを登録する端末が要るので、持ち主が行います。手順 1〜7 は途中で止めずに続けて行います。公開されたサイトでは、セットアップを最初に終えた人が管理者になるためです。

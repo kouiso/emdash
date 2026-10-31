@@ -17,3 +17,6 @@ worker-configuration.d.ts
 
 # ラッコキーワードの生データは public リポジトリに置かない（規約 第26・28・29条の扱いが未確定）
 keywords/*.csv
+
+# wrangler deploy --outdir bundled/ --dry-run の出力（サイズ確認用）
+bundled/
