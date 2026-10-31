@@ -1,0 +1,15 @@
+date: 2026-10-31 13:52:45 +0000
+cwd: /path/to/local-embeddings
+node: v22.22.0
+npm: 10.9.4
+command: bash -c cp ../code/extra/tsconfig.typecheck.json . && npm install --no-save typescript@7.0.2 @types/node@22.20.5
+exit: 0
+elapsed: 1978 ms
+--- stdout+stderr ---
+
+added 4 packages, changed 2 packages, and audited 51 packages in 2s
+
+14 packages are looking for funding
+  run `npm fund` for details
+
+found 0 vulnerabilities

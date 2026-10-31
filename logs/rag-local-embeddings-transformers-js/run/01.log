@@ -1,9 +1,9 @@
-date: 2026-10-31 13:47:55 +0000
+date: 2026-10-31 13:51:17 +0000
 cwd: /path/to/w
 node: v22.22.0
 npm: 10.9.4
 command: mkdir local-embeddings
 exit: 0
-elapsed: 4 ms
+elapsed: 6 ms
 --- stdout+stderr ---
 

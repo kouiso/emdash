@@ -22,7 +22,7 @@ function takeTail(sentences: string[], limit: number): string[] {
 export function chunkSection(section: Section, maxChars: number, overlapChars: number): string[] {
   const header = section.headings.join(" > ") + "\n";
   const budget = maxChars - countChars(header);
-  if (budget <= 0) throw new Error(`上限 ${maxChars} 字が見出しの行より短い: ${header.trim()}`);
+  if (budget <= 0) throw new Error(`上限 ${maxChars} 字が見出しの並びより短い: ${header.trim()}`);
   const pieces = splitSentences(section.body).flatMap((s) => splitLong(s, budget));
   const chunks: string[] = [];
   let current: string[] = [];

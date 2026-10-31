@@ -1,0 +1,30 @@
+date: 2026-10-31 13:52:47 +0000
+cwd: /path/to/local-embeddings
+node: v22.22.0
+npm: 10.9.4
+command: bash -c npx tsc -p tsconfig.typecheck.json; echo tsc_exit=$?; npx tsc -v
+exit: 0
+elapsed: 1955 ms
+--- stdout+stderr ---
+node_modules/@huggingface/tokenizers/types/index.d.ts(1,38): error TS2834: Relative import paths need explicit file extensions in ECMAScript imports when '--moduleResolution' is 'node16' or 'nodenext'. Consider adding an extension to the import path.
+node_modules/@huggingface/tokenizers/types/index.d.ts(2,39): error TS2834: Relative import paths need explicit file extensions in ECMAScript imports when '--moduleResolution' is 'node16' or 'nodenext'. Consider adding an extension to the import path.
+node_modules/@huggingface/tokenizers/types/index.d.ts(3,31): error TS2834: Relative import paths need explicit file extensions in ECMAScript imports when '--moduleResolution' is 'node16' or 'nodenext'. Consider adding an extension to the import path.
+node_modules/@huggingface/tokenizers/types/index.d.ts(4,15): error TS2834: Relative import paths need explicit file extensions in ECMAScript imports when '--moduleResolution' is 'node16' or 'nodenext'. Consider adding an extension to the import path.
+node_modules/@huggingface/tokenizers/types/index.d.ts(5,15): error TS2834: Relative import paths need explicit file extensions in ECMAScript imports when '--moduleResolution' is 'node16' or 'nodenext'. Consider adding an extension to the import path.
+node_modules/@huggingface/tokenizers/types/index.d.ts(6,15): error TS2834: Relative import paths need explicit file extensions in ECMAScript imports when '--moduleResolution' is 'node16' or 'nodenext'. Consider adding an extension to the import path.
+node_modules/@huggingface/tokenizers/types/index.d.ts(7,15): error TS2834: Relative import paths need explicit file extensions in ECMAScript imports when '--moduleResolution' is 'node16' or 'nodenext'. Consider adding an extension to the import path.
+node_modules/@huggingface/tokenizers/types/index.d.ts(8,15): error TS2834: Relative import paths need explicit file extensions in ECMAScript imports when '--moduleResolution' is 'node16' or 'nodenext'. Consider adding an extension to the import path.
+node_modules/@huggingface/transformers/types/models/lfm2_vl/image_processing_lfm2_vl.d.ts(35,5): error TS2416: Property '_call' in type 'Lfm2VlImageProcessor' is not assignable to the same property in base type 'ImageProcessor'.
+  Type '(images: RawImage[][] | RawImage[] | RawImage, { return_row_col_info }?: { return_row_col_info?: any; } | undefined) => Promise<Record<string, any>>' is not assignable to type '(images: RawImage[] | RawImage, ...args: any[]) => Promise<ImageProcessorResult>'.
+    Type 'Promise<Record<string, any>>' is not assignable to type 'Promise<ImageProcessorResult>'.
+      Type 'Record<string, any>' is missing the following properties from type 'ImageProcessorResult': pixel_values, original_sizes, reshaped_input_sizes
+node_modules/@huggingface/transformers/types/models/mgp_str/processing_mgp_str.d.ts(52,5): error TS2416: Property 'batch_decode' in type 'MgpstrProcessor' is not assignable to the same property in base type 'Processor'.
+  Type '([char_logits, bpe_logits, wp_logits]: [Tensor, Tensor, Tensor]) => { generated_text: string[]; scores: number[]; char_preds: string[]; bpe_preds: string[]; wp_preds: string[]; }' is not assignable to type '(batch: number[][] | Tensor, decode_args?: any) => string[]'.
+    Types of parameters '__0' and 'batch' are incompatible.
+      Type 'number[][] | Tensor' is not assignable to type '[Tensor, Tensor, Tensor]'.
+        Type 'number[][]' is not assignable to type '[Tensor, Tensor, Tensor]'.
+          Target requires 3 element(s) but source may have fewer.
+node_modules/@huggingface/transformers/types/utils/dtypes.d.ts(36,39): error TS2552: Cannot find name 'Float16ArrayConstructor'. Did you mean 'Float64ArrayConstructor'?
+node_modules/@huggingface/transformers/types/utils/maths.d.ts(109,125): error TS2304: Cannot find name 'Float16Array'.
+tsc_exit=1
+Version 7.0.2

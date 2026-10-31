@@ -1,4 +1,4 @@
-date: 2026-10-31 13:44:27 +0000
+date: 2026-10-31 13:51:04 +0000
 cwd: /path/to/jp-chunker
 node: v22.22.0
 icu: 77.1
@@ -22,6 +22,6 @@ sections: 5
   #9 first=28字 overlap=true prevLast=28字
 120: total overlap0 = 722 overlap40 = 793 diff = 71
 header chars (with newline): 26 budget at 40: 14
-guard: 上限 20 字が見出しの行より短い: ご利用ガイド > 返品について > 返品できる条件
+guard: 上限 20 字が見出しの並びより短い: ご利用ガイド > 返品について > 返品できる条件
 fence: [{"headings":["A"],"body":"```bash\n# not a heading\necho hi\n```"}]
 table sentences: ["| 列1 | 列2 |\n","|---|---|\n","| a | b |\n","| c | d |"]

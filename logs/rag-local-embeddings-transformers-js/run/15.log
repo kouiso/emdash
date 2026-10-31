@@ -1,0 +1,9 @@
+date: 2026-10-31 13:52:19 +0000
+cwd: /path/to/local-embeddings-skip
+node: v22.22.0
+npm: 10.9.4
+command: du -sh node_modules
+exit: 0
+elapsed: 20 ms
+--- stdout+stderr ---
+484M	node_modules

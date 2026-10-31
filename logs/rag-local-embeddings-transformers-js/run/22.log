@@ -1,0 +1,20 @@
+date: 2026-10-31 13:54:59 +0000
+cwd: /path/to/w
+node: v22.22.0
+npm: 10.9.4
+command: bash -c ls -l local-embeddings/node_modules/onnxruntime-node/bin/napi-v6/linux/x64 local-embeddings-skip/node_modules/onnxruntime-node/bin/napi-v6/linux/x64 | sed "s/  */ /g" | cut -d" " -f5-
+exit: 0
+elapsed: 8 ms
+--- stdout+stderr ---
+local-embeddings-skip/node_modules/onnxruntime-node/bin/napi-v6/linux/x64:
+
+45828512 Oct 31 13:52 libonnxruntime.so.1
+389488 Oct 31 13:52 onnxruntime_binding.node
+
+local-embeddings/node_modules/onnxruntime-node/bin/napi-v6/linux/x64:
+
+45828512 Oct 31 13:51 libonnxruntime.so.1
+272054000 Oct 31 13:51 libonnxruntime_providers_cuda.so
+14632 Oct 31 13:51 libonnxruntime_providers_shared.so
+1084896 Oct 31 13:51 libonnxruntime_providers_tensorrt.so
+389488 Oct 31 13:51 onnxruntime_binding.node

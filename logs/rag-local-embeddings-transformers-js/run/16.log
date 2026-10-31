@@ -1,0 +1,11 @@
+date: 2026-10-31 13:52:24 +0000
+cwd: /path/to/local-embeddings-skip
+node: v22.22.0
+npm: 10.9.4
+command: node search.ts 返金はいつ？
+exit: 0
+elapsed: 4577 ms
+--- stdout+stderr ---
+0.852 returns
+0.832 cancel
+0.823 points
