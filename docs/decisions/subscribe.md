@@ -24,7 +24,7 @@ EmDash 1.3.1 には使えるフォーム機能が無いので、登録は Astro 
 | ネイティブプラグインの storage | 採らない。ドキュメントにある仕組みだが、1テーブルに書くだけのためにプラグインを1つ作ることになり、変更が大きい |
 | D1 に独自テーブル（採用） | EmDash のテーブルは `ec_*` などの名前で、`newsletter_subscribers` とはぶつからない。Astro の Cloudflare アダプターでは `import { env } from "cloudflare:workers"` で `DB` に届く（https://docs.astro.build/en/guides/integrations-guide/cloudflare/ ） |
 
-このリポジトリにはサイト用のマイグレーションの仕組みが無い（EmDash のマイグレーションは EmDash 自身のテーブルだけを扱う）。wrangler の D1 マイグレーションを足すと、deploy のたびに `wrangler d1 migrations apply` を別に流す手順が増え、忘れると本番で登録が落ちる。そこで、書き込みの直前に `CREATE TABLE IF NOT EXISTS` を流す。D1 への問い合わせが1回増えるだけで、手順は増えない。スキーマは `src/utils/subscribers.ts` の1か所にある。
+このリポジトリにはサイト用のマイグレーションの仕組みが無い（EmDash のマイグレーションは EmDash 自身のテーブルだけを扱う）。wrangler の D1 マイグレーションを足すと、deploy のたびに `wrangler d1 migrations apply` を別に流す手順が増え、忘れると本番で登録が落ちる。そこで、先に `INSERT` を流し、`no such table: newsletter_subscribers` で失敗したとき（最初の1件）だけ `CREATE TABLE IF NOT EXISTS` を流して入れ直す。ふだんの登録は D1 への問い合わせが1回で済み、手順も増えない（2026-10-31 のレビューで、毎回 `CREATE TABLE` を流していた実装を直した）。スキーマは `src/utils/subscribers.ts` の1か所にある。
 
 ## テーブル
 
