@@ -181,7 +181,7 @@ writing-lint.py の FATAL のうち個人名の検出は、スクリプトの `P
 
 1. `logs/<slug>/gate.md` と lint の出力を読み直す。`status: ready` 以外は投稿しない。
 2. 公開日を決める。1日1本。`content/articles/*.md` の `publish_at` で最も遅い日の翌日と、今日の翌日の、遅いほうにする。時刻は毎日同じにし、最初の記事で決めた時刻を README に書いて以後それに揃える。
-3. EmDash の MCP（`/_emdash/api/mcp`、OAuth 2.1）で `posts` に記事を作り、予約公開にする。`posts` コレクションは `seed/seed.json` で `drafts`、`revisions`、`preview`、`scheduling` を持っていて、予約公開の実行は Worker の scheduled handler と毎分の cron（`wrangler.jsonc`）が担う。MCP のどのツールで作成・予約するか、Markdown を本文の Portable Text にどう変換するかは、実装時にドキュメントで確認する（`AGENTS.md` にあるとおり docs の MCP で `search_docs` を引く。このリポジトリには docs の MCP の設定ファイルが無いので、使えないときは CLAUDE.md のとおり docs.emdashcms.com を直接読む）。
+3. EmDash の MCP（`/_emdash/api/mcp`、OAuth 2.1）で `posts` に記事を作り、予約公開にする。`posts` コレクションは `seed/seed.json` で `drafts`、`revisions`、`preview`、`scheduling` を持っていて、予約公開の実行は Worker の scheduled handler と毎分の cron（`wrangler.jsonc`）が担う。作成は `content_create`（`collection:"posts"`、`slug`、`data:{title, excerpt, content}`。既定で draft になる。`content` には Markdown の文字列をそのまま渡せば Portable Text に変換される）、予約は `content_get` で `_rev` を取ってから `content_schedule`（未来の ISO 8601。`+09:00` 付きでよい）で行う。`content_publish` は予約を消してすぐ公開するので、予約した記事には使わない。返った ULID の `id` を `publish.md` に記録する。根拠はローカルでの検証記録 `docs/verification/local-mcp.md`（2026-10-31）。予約時刻を過ぎた記事は Cron Trigger で scheduled handler が動いた時点で公開される。本番の Cron が実際に動くことは、deploy 後に確かめる。
 4. MCP で予約公開ができなかったときは、記事を下書きとして投稿しておき、Claude Code の scheduled task で毎日1本ずつ公開する。scheduled task のプロンプトには「`publish_at` が今日の記事を1本だけ公開し、`publish.md` に記録する」と書く。
 5. 投稿したら frontmatter の `status` を `scheduled` に、`publish_at` を予約日時に更新し、`logs/<slug>/publish.md` に記録する。
 6. この記事の `prev` に当たる記事の `next` が空なら、その記事を手順「公開後に直す」で更新して、この記事へのリンクを足す。
@@ -331,7 +331,7 @@ logs/<slug>/
 - 直すときは、必ず `content/articles/<slug>.md` と EmDash の両方を更新する。片方だけ直すと、どちらが正しいかわからなくなる。EmDash の管理画面で人が直した記事は、先にその内容を原稿へ取り込んでから手を入れる。
 - 直した原稿は手順7と8をもう一度通し、`logs/<slug>/lint/` と `gate.md` を更新する。ゲートに落ちる直し方はしない。
 - 直したら frontmatter の `updated` を更新し、`publish.md` に何をなぜ直したかを書く。
-- 誤りが見つかって、すぐに直せないときは、EmDash のリビジョンで前の版に戻すか、記事を下書きに戻す（`posts` は `revisions` と `drafts` を持っている）。MCP でどちらをどう操作するかは、実装時にドキュメントで確認する。原稿側は `status` を `draft` に戻し、git の履歴は消さずに新しいコミットで戻す。
+- 誤りが見つかって、すぐに直せないときは、EmDash のリビジョンで前の版に戻すか、記事を下書きに戻す（`posts` は `revisions` と `drafts` を持っている）。MCP では、リビジョンで戻すなら `revision_list`（`id` には slug ではなく ULID を渡す。slug を渡すとエラーにならずに空の一覧が返る）→ `revision_restore`（下書きが置き換わるだけ）→ `content_get` → `content_publish` の順に呼ぶ。下書きに戻すなら `content_get` → `content_unpublish` を呼ぶ（根拠は `docs/verification/local-mcp.md`）。原稿側は `status` を `draft` に戻し、git の履歴は消さずに新しいコミットで戻す。
 - 前後リンクの更新（手順10の6）もこの手順で行う。
 
 ## 止めて報告する条件
