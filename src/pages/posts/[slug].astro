@@ -181,7 +181,7 @@ const articleMeta = {
 		<aside class="article-aside">
 			{
 				toc.length > 0 && (
-					<nav class="card toc" aria-label="目次">
+					<nav class="card toc" aria-label="目次" data-toc>
 						<p class="toc__title">目次</p>
 						<ol class="toc__list">
 							{toc.map((item) => (
@@ -203,10 +203,22 @@ const articleMeta = {
 </Base>
 
 <script is:inline>
+	// 目次（src/utils/toc.ts の buildToc）と同じ数え方で本文の h2 に id を振る。
+	// buildToc は文字の無い h2 を飛ばすので、ここでも飛ばす。h2 に id が既にあるときは書き換えず、
+	// 目次のリンク先をその id に合わせる
 	(function () {
 		var headings = document.querySelectorAll("[data-prose] h2");
+		var n = 0;
 		for (var i = 0; i < headings.length; i++) {
-			if (!headings[i].id) headings[i].id = "sec-" + (i + 1);
+			if (!headings[i].textContent || !headings[i].textContent.trim()) continue;
+			n++;
+			var expected = "sec-" + n;
+			if (!headings[i].id) {
+				headings[i].id = expected;
+			} else if (headings[i].id !== expected) {
+				var link = document.querySelector('[data-toc] a[href="#' + expected + '"]');
+				if (link) link.setAttribute("href", "#" + headings[i].id);
+			}
 		}
 	})();
 </script>
