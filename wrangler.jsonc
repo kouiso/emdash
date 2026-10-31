@@ -1,6 +1,6 @@
 {
 	"$schema": "node_modules/wrangler/config-schema.json",
-	"name": "emdash-trial-20261021",
+	"name": "ai-eng-blog",
 	"main": "./src/worker.ts",
 	"compatibility_date": "2026-10-25",
 	"compatibility_flags": ["nodejs_compat"],

@@ -15,7 +15,7 @@ Claude 向けの運用ルールは [CLAUDE.md](./CLAUDE.md)、EmDash のコー�
 | 予約公開とメンテナンス | EmDash 公式の scheduled handler と毎分の Cron Trigger |
 | 文章の規約 | [tech-writing-pack](./vendor/tech-writing-pack/)（`vendor/` に同梱） |
 
-版は `package.json` と `package-lock.json` で固定しています。Node.js は 24 以上が必要です。
+版は `package.json` と `package-lock.json` で固定しています。Node.js は 24 系を使います（`.nvmrc` に `24`、`package.json` の `engines` に `24.x`）。Cloudflare Workers Builds は `.nvmrc` を読んでビルドの Node.js の版を決めます（https://developers.cloudflare.com/workers/ci-cd/builds/build-image/ 、2026-10-31 確認）。
 
 ## ローカルで動かす
 
@@ -113,8 +113,9 @@ PoC の目的は、自動化した執筆と公開が役に立つかを判断す�
   - D1 `emdash-trial-20261021-db`（バインディング `DB`）
   - R2 `emdash-trial-20261021-media`（バインディング `MEDIA`）
   - KV `emdash-trial-20261021-session`（Astro 標準の `SESSION`）
-- Worker `emdash-trial-20261021` は作成も deploy もされていません。静的アセットは Workers Assets（`ASSETS`）で配る設定です。
-- リポジトリ名と Worker 名は、まだ旧名（`emdash`、`emdash-trial-20261021`）のままです。`package.json` と `package-lock.json` の `name` は `ai-eng-blog` に揃えました。
+- Worker はまだ作成も deploy もされていません。`wrangler.jsonc` の Worker 名は `ai-eng-blog` です（2026-10-31 に旧名 `emdash-trial-20261021` から変更。旧名の Worker は一度も作られていないので、消すものはありません）。D1、R2、KV は上の旧名のリソースをそのまま使い、名前、ID、バインディングは変えていません。静的アセットは Workers Assets（`ASSETS`）で配る設定です。
+- Workers Builds では、ダッシュボードの Worker 名と `wrangler.jsonc` の `name` が一致しないとビルドが失敗します（https://developers.cloudflare.com/workers/ci-cd/builds/troubleshoot/ 、2026-10-31 確認）。Worker をつなぐときは `ai-eng-blog` という名前にします。
+- リポジトリ名は旧名（`emdash`）のままです。`package.json` と `package-lock.json` の `name` は `ai-eng-blog` です。
 - Access、LOADER、AI、メール、独自 DNS、有料 CI は追加していません。フォントは OS 標準、画像変換は無効です。
 - ローカルでのビルド、型チェック、`wrangler deploy --dry-run` は 2026-10-25 に通っています（VERIFICATION.md）。
 
