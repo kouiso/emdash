@@ -9,6 +9,7 @@ import { Image, PortableText } from "emdash/ui";
 import Base from "../../layouts/Base.astro";
 import { courseStepForTags, formatDateJa } from "../../utils/course";
 import { resolveStarterSiteIdentity } from "../../utils/site-identity";
+import { getSiteOrigin } from "../../utils/site-origin";
 import { buildToc } from "../../utils/toc";
 
 const slug = decodeSlug(Astro.params.slug);
@@ -25,11 +26,12 @@ if (!post) {
 
 if (Astro.cache?.enabled) Astro.cache.set(cacheHint);
 const { siteTitle } = resolveStarterSiteIdentity(await getSiteSettings());
+const siteOrigin = getSiteOrigin(Astro.url);
 
 // SEO meta from content fields
 const seo = getSeoMeta(post, {
 	siteTitle,
-	siteUrl: Astro.url.origin,
+	siteUrl: siteOrigin,
 	path: Astro.url.pathname.replace(/\/$/, ""),
 });
 
@@ -60,7 +62,7 @@ function formatIsoDateJa(value: string): string | null {
 }
 // SEO パネルにも記事にも画像が無いときは、タイトルから作る OGP 画像を使う
 const ogImage =
-	seo.ogImage ?? new URL(`/og/posts/${encodeURIComponent(slug)}.svg`, Astro.url.origin).href;
+	seo.ogImage ?? new URL(`/og/posts/${encodeURIComponent(slug)}.svg`, siteOrigin).href;
 const articleMeta = {
 	publishedTime: publishedAt ? publishedAt.toISOString() : null,
 	modifiedTime: updatedAt.toISOString(),

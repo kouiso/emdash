@@ -1,5 +1,6 @@
 import type { APIRoute } from "astro";
 import { getEmDashCollection } from "emdash";
+import { siteUrlFor } from "../utils/site-origin";
 import { escapeXml, xmlResponse } from "../utils/sitemap";
 
 export const prerender = false;
@@ -34,7 +35,7 @@ export const GET: APIRoute = async ({ url }) => {
 		paths.push(...(await collectionSitemapPaths(collection)));
 	}
 	const items = paths
-		.map((path) => `\t<sitemap><loc>${escapeXml(new URL(path, url.origin).href)}</loc></sitemap>`)
+		.map((path) => `\t<sitemap><loc>${escapeXml(siteUrlFor(path, url))}</loc></sitemap>`)
 		.join("\n");
 	return xmlResponse(
 		`<?xml version="1.0" encoding="UTF-8"?>\n<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${items}\n</sitemapindex>\n`,

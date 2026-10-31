@@ -3,6 +3,7 @@ import { getEmDashEntry, getSeoMeta, decodeSlug, getSiteSettings } from "emdash"
 import { PortableText } from "emdash/ui";
 import Base from "../layouts/Base.astro";
 import { resolveStarterSiteIdentity } from "../utils/site-identity";
+import { getSiteOrigin } from "../utils/site-origin";
 
 const slug = decodeSlug(Astro.params.slug);
 
@@ -21,7 +22,7 @@ const { siteTitle } = resolveStarterSiteIdentity(await getSiteSettings());
 
 const seo = getSeoMeta(page, {
 	siteTitle,
-	siteUrl: Astro.url.origin,
+	siteUrl: getSiteOrigin(Astro.url),
 	path: Astro.url.pathname.replace(/\/$/, ""),
 });
 ---

@@ -4,6 +4,7 @@ import { getMenuWithCacheHint, getSiteSettingsWithCacheHint } from "emdash";
 import { EmDashHead, EmDashBodyStart, EmDashBodyEnd } from "emdash/ui";
 import { createPublicPageContext } from "emdash/page";
 import { readEnv } from "../utils/env";
+import { getSiteOrigin } from "../utils/site-origin";
 import { resolveStarterSiteIdentity } from "../utils/site-identity";
 
 type PageContextInput = Parameters<typeof createPublicPageContext>[0];
@@ -65,9 +66,10 @@ const navItems =
 		? menuResult.data.items
 		: fallbackNav;
 const currentPath = Astro.url.pathname.replace(/\/$/, "") || "/";
+const siteOrigin = getSiteOrigin(Astro.url);
 const pageCanonical = noindex
 	? null
-	: (canonical ?? new URL(currentPath, Astro.url.origin).href);
+	: (canonical ?? new URL(currentPath, siteOrigin).href);
 // 計測は Cloudflare Web Analytics（Cookie を使わない無料の計測）。トークンが無い環境では出さない
 const analyticsToken = readEnv("PUBLIC_CF_ANALYTICS_TOKEN");
 
@@ -82,7 +84,7 @@ const pageCtx = createPublicPageContext({
 	image,
 	content,
 	siteName: siteTitle,
-	siteUrl: Astro.url.origin,
+	siteUrl: siteOrigin,
 	articleMeta,
 });
 ---
