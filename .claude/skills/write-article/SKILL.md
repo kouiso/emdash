@@ -1,13 +1,13 @@
 ---
 name: write-article
-description: ブログ記事を1本、キーワード選びから EmDash への予約公開まで通して書くときに使う。keywords/*.csv から1語を選び、vendor/tech-writing-pack の guides と checklist.md に従って content/articles/<slug>.md と logs/<slug>/ を作り、公開前ゲートをすべて通ったものだけを MCP で予約公開する。公開済み記事を直すとき、取り下げるときもこのスキルを使う。
+description: ブログ記事を1本、キーワード選びから EmDash への予約公開まで通して書くときに使う。keywords/*.csv から1語を選び、docs/tech-writing-pack の guides と checklist.md に従って content/articles/<slug>.md と logs/<slug>/ を作り、公開前ゲートをすべて通ったものだけを MCP で予約公開する。公開済み記事を直すとき、取り下げるときもこのスキルを使う。
 ---
 
 # write-article（記事を1本書いて公開する）
 
 1回の実行で書く記事は1本だけです。途中のどこかで公開前ゲートに落ちたら、その記事は下書きのまま止めて、落ちた項目と理由を報告します。ゲートを緩めて先に進めることはしません。
 
-書き方のルールの正本は `vendor/tech-writing-pack/`（CC BY 4.0、出典は `vendor/NOTICE.md`）です。このスキルは pack の手順をこのリポジトリでどう回すかだけを決めていて、pack の内容を言い換えたり緩めたりはしません。迷ったら pack の原文を読みます。
+書き方のルールの正本は `docs/tech-writing-pack/`（CC BY 4.0、出典は `NOTICE.md`）です。このスキルは pack の手順をこのリポジトリでどう回すかだけを決めていて、pack の内容を言い換えたり緩めたりはしません。迷ったら pack の原文を読みます。
 
 ## 役割分担
 
@@ -20,8 +20,8 @@ description: ブログ記事を1本、キーワード選びから EmDash への�
 
 ## 前提（読む順）
 
-1. `vendor/tech-writing-pack/checklist.md`（公開前ゲートの本体。下の表に全項目を写してある）
-2. `vendor/tech-writing-pack/guides/01-seo-for-dev-blogs.md`、`02-article-structures.md`、`09-ai-writing-manual.md`
+1. `docs/tech-writing-pack/checklist.md`（公開前ゲートの本体。下の表に全項目を写してある）
+2. `docs/tech-writing-pack/guides/01-seo-for-dev-blogs.md`、`02-article-structures.md`、`09-ai-writing-manual.md`
 3. 書いている途中で `03-anti-ai.md`、`04-collocation.md`、`05-technical-writing.md` を引く
 4. `keywords/README.md`（CSV の置き場所と列）
 
@@ -137,10 +137,10 @@ checklist の C08「コードはコピペで動く形（import・前提を省略
 ```bash
 mkdir -p logs/<slug>/lint
 
-python3 vendor/tech-writing-pack/scripts/ai-smell-lint.py content/articles/<slug>.md \
+python3 docs/tech-writing-pack/scripts/ai-smell-lint.py content/articles/<slug>.md \
   > logs/<slug>/lint/ai-smell.txt 2>&1; echo "exit=$?" >> logs/<slug>/lint/ai-smell.txt
 
-python3 vendor/tech-writing-pack/scripts/writing-lint.py content/articles/<slug>.md --type article --register standard \
+python3 docs/tech-writing-pack/scripts/writing-lint.py content/articles/<slug>.md --type article --register standard \
   > logs/<slug>/lint/writing-lint.txt 2>&1; echo "exit=$?" >> logs/<slug>/lint/writing-lint.txt
 ```
 
@@ -160,7 +160,7 @@ frontmatter の扱い。`ai-smell-lint.py` は ASCII のダブルクオート `"
 3. frontmatter の行に出た `📎mention` は use として扱う。⑫章境界アナウンス、⑬テンプレ比喩、記号NG は1件で、⑧否定対比構文は本文の use と合わせて2件で FATAL とみなし、G01 と C33 の不合格として直すまで先へ進まない。
 4. この扱いをしたことと、frontmatter の行で出た検出の一覧を `judgments.md` に書く。
 
-writing-lint.py の FATAL のうち個人名の検出は、スクリプトの `PERSONAL_NAMES` が空のリストなので、実際には何も検出しません。`vendor/` は書き換えないので、guides/09 §1-1 の禁止事項「個人名なし」は別に確かめます。ユーザーの名前、アカウント名、関係者の名前を1つずつ `grep -n` で原稿にかけ、0件であることを確かめ、かけた語の種類（名前そのものではなく「ユーザーの GitHub アカウント名」のような書き方）と結果を、`gate.md` の G09 の行に秘密情報の確認と並べて書きます。
+writing-lint.py の FATAL のうち個人名の検出は、スクリプトの `PERSONAL_NAMES` が空のリストなので、実際には何も検出しません。pack（`docs/tech-writing-pack/`）は書き換えないので、guides/09 §1-1 の禁止事項「個人名なし」は別に確かめます。ユーザーの名前、アカウント名、関係者の名前を1つずつ `grep -n` で原稿にかけ、0件であることを確かめ、かけた語の種類（名前そのものではなく「ユーザーの GitHub アカウント名」のような書き方）と結果を、`gate.md` の G09 の行に秘密情報の確認と並べて書きます。
 
 警告の扱い。
 
@@ -212,7 +212,7 @@ writing-lint.py の FATAL のうち個人名の検出は、スクリプトの `P
 
 ### B. checklist.md の全項目（原文のまま）
 
-`vendor/tech-writing-pack/checklist.md` の項目を、文言を変えずに全部写しています。区分の列は checklist の見出しそのままです。C33 のコマンドは pack のディレクトリから見たパスなので、このリポジトリでは手順7のコマンドで実行します。C39 は checklist 自身が「（任意）」としている項目なので、入れたかどうかを記録します。C37 の「実体験・判断・動作確認」は、Claude が実際に動かした結果（`run/` のログ）と、その結果から下した判断で満たし、どれを根拠にしたかを `gate.md` に書きます。満たせなければ下書きで止めます。
+`docs/tech-writing-pack/checklist.md` の項目を、文言を変えずに全部写しています。区分の列は checklist の見出しそのままです。C33 のコマンドは pack のディレクトリから見たパスなので、このリポジトリでは手順7のコマンドで実行します。C39 は checklist 自身が「（任意）」としている項目なので、入れたかどうかを記録します。C37 の「実体験・判断・動作確認」は、Claude が実際に動かした結果（`run/` のログ）と、その結果から下した判断で満たし、どれを根拠にしたかを `gate.md` に書きます。満たせなければ下書きで止めます。
 
 `gate.md` には、この表に「判定（OK / NG / 任意・なし）」と「根拠」の2列を足して写します。
 

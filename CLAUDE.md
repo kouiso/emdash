@@ -29,7 +29,7 @@ EmDash 自体の書き方（サーバーレンダリング必須、画像フィ�
 
 | 場所 | 中身 |
 |---|---|
-| `vendor/tech-writing-pack/` | 書き方の規約。上流のファイルをそのまま置いています。編集しません。出典は `vendor/NOTICE.md` |
+| `docs/tech-writing-pack/` | 書き方の規約。上流のファイルをそのまま置いています。編集しません。出典は `NOTICE.md`。`vendor/` には戻しません（執筆に使う環境の Read 禁止ルール `Read(./**/vendor/**)` でガイドが読めなくなるため） |
 | `.claude/skills/write-article/` | 記事を1本書いて公開するまでの手順と公開前ゲート |
 | `content/articles/<slug>.md` | 記事の原稿。公開中の状態は EmDash、原稿と経緯はこのリポジトリが持ちます |
 | `logs/<slug>/` | コードの実行ログ、lint の結果、キーワードを選んだ理由、checklist の各項目の根拠 |
@@ -40,7 +40,7 @@ EmDash 自体の書き方（サーバーレンダリング必須、画像フィ�
 
 記事を書く、直す、公開する作業は、必ず `.claude/skills/write-article/SKILL.md` を読んでから始めます。手順と公開前ゲートの正本はそのスキルで、ここには要点だけを書きます。
 
-公開前ゲートでは、`vendor/tech-writing-pack/checklist.md` の全項目をそのまま使います。こちらで緩めたり読み替えたりはしません。ひとつでも満たせない記事は下書きで止めて報告します。
+公開前ゲートでは、`docs/tech-writing-pack/checklist.md` の全項目をそのまま使います。こちらで緩めたり読み替えたりはしません。ひとつでも満たせない記事は下書きで止めて報告します。
 
 - `ai-smell-lint.py` は checklist の「`python3 scripts/ai-smell-lint.py 記事.md` を実行し、FATALがゼロ」を満たすまで直します。warn は1件ずつ use か mention かを判断し、`logs/<slug>/` に記録します。
 - `writing-lint.py` も FATAL 0件にし、DENSITY 超過は上限内まで間引きます（pack の `guides/09-ai-writing-manual.md` 2節）。

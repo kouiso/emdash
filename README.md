@@ -13,7 +13,7 @@ Claude 向けの運用ルールは [CLAUDE.md](./CLAUDE.md)、EmDash のコー�
 | 実行環境 | Cloudflare Workers |
 | データ | D1（記事などの DB）、R2（画像）、KV（セッション） |
 | 予約公開とメンテナンス | EmDash 公式の scheduled handler と毎分の Cron Trigger |
-| 文章の規約 | [tech-writing-pack](./vendor/tech-writing-pack/)（`vendor/` に同梱） |
+| 文章の規約 | [tech-writing-pack](./docs/tech-writing-pack/)（`docs/tech-writing-pack/` に変更なしで同梱） |
 
 版は `package.json` と `package-lock.json` で固定しています。Node.js は 24 系を使います（`.nvmrc` に `24`、`package.json` の `engines` に `24.x`）。Cloudflare Workers Builds は `.nvmrc` を読んでビルドの Node.js の版を決めます（https://developers.cloudflare.com/workers/ci-cd/builds/build-image/ 、2026-10-31 確認）。
 
@@ -229,4 +229,4 @@ PoC の目的は、自動化した執筆と公開が役に立つかを判断す�
 ## クレジット
 
 - EmDash の公式 Cloudflare starter（[`emdash@1.3.1` の release commit](https://github.com/emdash-cms/emdash/tree/12a179389f07821beb819a684e62627e6017ba8d/templates/starter-cloudflare)）をもとにしています。Copyright 2026 Cloudflare Inc.、[MIT ライセンス](./LICENSE)です。変更点は [NOTICE.md](./NOTICE.md) にあります。
-- 文章の規約は [hana652/tech-writing-pack](https://github.com/hana652/tech-writing-pack) を `vendor/tech-writing-pack/` に変更なしで同梱しています。ライセンスは [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) です。取り込んだ版と出典は [vendor/NOTICE.md](./vendor/NOTICE.md) にあります。
+- 文章の規約は [hana652/tech-writing-pack](https://github.com/hana652/tech-writing-pack) を `docs/tech-writing-pack/` に変更なしで同梱しています。ライセンスは [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) です。取り込んだ版と出典は [NOTICE.md](./NOTICE.md) にあります。

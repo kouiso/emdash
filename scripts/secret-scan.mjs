@@ -36,7 +36,7 @@ const ALLOWED = [
 	"XXXX.DUMMY.TOKEN.XXXX",
 ];
 
-const SKIP = [/^package-lock\.json$/, /^vendor\//, /(^|\/)node_modules\//, /\.(png|jpe?g|gif|webp|ico|zip|pdf|woff2?)$/i];
+const SKIP = [/^package-lock\.json$/, /^docs\/tech-writing-pack\//, /(^|\/)node_modules\//, /\.(png|jpe?g|gif|webp|ico|zip|pdf|woff2?)$/i];
 
 function git(...args) {
 	return execFileSync("git", args, { encoding: "utf8" });
