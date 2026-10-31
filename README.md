@@ -34,7 +34,15 @@ npx wrangler dev --local
 
 ローカルでの動作確認は、下の「ユーザーにしかできないこと」が済んでいなくても Claude が自分で行います。
 
-`wrangler.jsonc` の `EMDASH_SITE_URL` を本番の URL に書き換えたあとは、ローカルでも本番の URL が使われ、ローカルでのセットアップやパスキーの登録が本番のドメインに結び付いてしまいます。そのあとは `npx wrangler dev --local --var EMDASH_SITE_URL:http://localhost:8787` で起動します（[docs/decisions/site-url.md](./docs/decisions/site-url.md)）。
+`wrangler.jsonc` の `EMDASH_SITE_URL` には本番の URL（`https://ai-eng-blog.kouiso.workers.dev`）が入っています。そのまま `npx wrangler dev --local` で起動すると、ローカルでも本番の URL が使われ、ローカルでのセットアップやパスキーの登録が本番のドメインに結び付き、canonical や sitemap も本番の URL になります。ローカルでは次のように上書きして起動します（[docs/decisions/site-url.md](./docs/decisions/site-url.md)）。
+
+```sh
+npx wrangler dev --local --var EMDASH_SITE_URL:http://localhost:8787
+```
+
+ローカル（`localhost`、`127.0.0.1`）で開いているときは、Turnstile のキーが無くても登録フォームを試せます。それ以外のアドレスでは、キーが2つそろうまで登録を受け付けません（[docs/decisions/subscribe.md](./docs/decisions/subscribe.md)）。
+
+テストは `npm test` で実行します（vitest。メールアドレスの検証、本文の上限、Turnstile、D1 への保存を Node で確かめます）。
 
 ## 記事の任意フィールド
 
@@ -69,14 +77,14 @@ Workers の無料枠では、Worker のサイズは圧縮前で 64 MiB まで、
 
 Cloudflare のダッシュボードでの操作と、パスキーを登録する端末が要るので、持ち主が行います。手順 1〜7 は途中で止めずに続けて行います。公開されたサイトでは、セットアップを最初に終えた人が管理者になるためです。
 
-1. 公開 URL を確かめて書き換える
-   - ダッシュボードの Workers & Pages を開き、「Your subdomain」に出ているサブドメインを確かめます（https://developers.cloudflare.com/workers/configuration/routing/workers-dev/ 、2026-10-31 確認）。
-   - 公開 URL は `https://ai-eng-blog.<そのサブドメイン>.workers.dev` です。
-   - Claude にこの URL を伝えます。Claude が `wrangler.jsonc` の `EMDASH_SITE_URL` の `REPLACE_WITH_WORKERS_DEV_URL` をこの URL に書き換えて push します。
-   - 書き換えずに deploy してもエラーは出ません。値は黙って無視されます。必ず先に書き換えます。理由は [docs/decisions/site-url.md](./docs/decisions/site-url.md) にあります。
+1. 公開 URL を確かめる
+   - 公開 URL は `https://ai-eng-blog.kouiso.workers.dev` です。`wrangler.jsonc` の `EMDASH_SITE_URL` にこの値が入っています（2026-10-31、持ち主がダッシュボードの Workers & Pages の「Your subdomain」で `kouiso` を確かめた値）。
+   - ダッシュボードの「Your subdomain」が `kouiso` のままであることを、deploy の前にもう一度確かめます（https://developers.cloudflare.com/workers/configuration/routing/workers-dev/ 、2026-10-31 確認）。違っていたら、先に Claude に伝えて `EMDASH_SITE_URL` を直してもらいます。URL の形の値が違っていてもエラーは出ず、パスキーが違うアドレスに結び付きます。理由は [docs/decisions/site-url.md](./docs/decisions/site-url.md) にあります。
 2. Worker をつなぐ
    - Workers & Pages で Create application を選び、GitHub を選んでこのリポジトリを選びます（https://developers.cloudflare.com/workers/ci-cd/builds/ 、2026-10-31 確認）。
    - Worker 名は `ai-eng-blog` にします。`wrangler.jsonc` の `name` と違うと、ビルドが `The name in your Wrangler configuration file (<Worker name>) must match the name of your Worker.` で失敗します（https://developers.cloudflare.com/workers/ci-cd/builds/troubleshoot/ ）。
+   - **Worker の名前もアカウントのサブドメインも、ここで変えません。** workers.dev の URL は `<Worker 名>.<サブドメイン>.workers.dev` の形なので、どちらかを変えると公開 URL が `EMDASH_SITE_URL` とずれます。変える必要が出たら、手順 4 に進む前に止めて、Claude に新しい URL を伝え、`wrangler.jsonc` の `name` と `EMDASH_SITE_URL` を直してもらってから続けます。最初の管理者を作ったあとで変えると、パスキーを作り直すことになります（下の「独自ドメインに移す」と同じ手順）。
+   - 旧名の Worker `emdash-trial-20261021` は、中身の無い Worker としてダッシュボードに残っています（下の「現状」）。これには接続しません。
    - 設定は次のとおりです（https://developers.cloudflare.com/workers/ci-cd/builds/configuration/ ）。
 
      | 項目 | 値 |
@@ -89,9 +97,9 @@ Cloudflare のダッシュボードでの操作と、パスキーを登録する
    - Node.js の版は `.nvmrc` の `24` が使われます。npm の版は `package.json` の `packageManager` で決まり、`engines` では決まりません。このリポジトリには `packageManager` が無いので、ビルドイメージに入っている npm が使われます（https://developers.cloudflare.com/workers/ci-cd/builds/build-image/ ）。
    - Save and Deploy を選びます。
 3. deploy が済んだことを確かめる
-   - ビルドのログが成功で終わり、`https://ai-eng-blog.<サブドメイン>.workers.dev/` が表示されることを確かめます。
+   - ビルドのログが成功で終わり、`https://ai-eng-blog.kouiso.workers.dev/` が表示されることを確かめます。
 4. すぐに管理画面を開く
-   - `https://ai-eng-blog.<サブドメイン>.workers.dev/_emdash/admin` を開きます。手順 1 で書き換えた URL と完全に同じアドレスで開きます。パスキーは作ったアドレスでしか使えません（https://docs.emdashcms.com/guides/authentication/ ）。
+   - `https://ai-eng-blog.kouiso.workers.dev/_emdash/admin` を開きます。手順 1 の URL と完全に同じアドレスで開きます。パスキーは作ったアドレスでしか使えません（https://docs.emdashcms.com/guides/authentication/ ）。
    - 「Set up your site」のセットアップ画面が出たら、手順 5 に進みます。
    - **次のどちらかになったら、そこで止めます。** セットアップ画面が出ずにサインイン画面になった場合と、自分の知らない管理者がいる場合です。どちらも、自分より先に誰かがセットアップを終えたことを意味します。記事は公開せず、MCP もつながず、下の「D1 を作り直す」に進みます。
 5. 最初の管理者を作る
@@ -103,7 +111,7 @@ Cloudflare のダッシュボードでの操作と、パスキーを登録する
 7. 受け入れ条件を確かめる（VERIFICATION.md）
    - Posts でタイトル `試用確認・合成データ` の下書きを保存し、`fixtures/trial.png` をメディアにアップロードします。再読み込みして、どちらも残っていることを確かめます。
 
-Git branch 以外のブランチに push すると、Workers Builds はプレビューを作ります（https://developers.cloudflare.com/workers/ci-cd/builds/ ）。プレビューはトップレベルのバインディングと `vars` を引き継がず、プレビューの URL は公開されます（https://docs.emdashcms.com/deployment/cloudflare/ ）。プレビューの URL でセットアップはしません。
+Git branch 以外のブランチに push すると、Workers Builds はプレビューを作ります（https://developers.cloudflare.com/workers/ci-cd/builds/ ）。プレビューはトップレベルのバインディングと `vars` を引き継がず、プレビューの URL は公開されます（https://docs.emdashcms.com/deployment/cloudflare/ ）。このリポジトリは `wrangler.jsonc` の `"preview_urls": false` で Version URL（プレビューの URL を含む）を切っているので、本番と同じ D1 に別の URL から届くことはありません（https://developers.cloudflare.com/workers/configuration/previews/ 、2026-10-31 確認）。ダッシュボードの Settings → Domains & Routes で Preview URLs を有効にし直さないでください。deploy のあと、Preview URLs が無効になっていることを確かめます（[docs/verification/post-deploy.md](./docs/verification/post-deploy.md)）。
 
 ### D1 を作り直す（手順 4 で止めたとき）
 
