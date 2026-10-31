@@ -32,7 +32,11 @@ function isSiteverifyResponse(value: unknown): value is { success: boolean; "err
 	return typeof value === "object" && value !== null && typeof Reflect.get(value, "success") === "boolean";
 }
 
-export async function verifyTurnstileToken(secret: string, token: string | null): Promise<TurnstileResult> {
+export async function verifyTurnstileToken(
+	secret: string,
+	token: string | null,
+	fetchImpl: typeof fetch = fetch,
+): Promise<TurnstileResult> {
 	if (!token || token.length > MAX_TOKEN_LENGTH) return { ok: false, reason: "missing_token" };
 
 	const body = new FormData();
@@ -41,7 +45,7 @@ export async function verifyTurnstileToken(secret: string, token: string | null)
 
 	let response: Response;
 	try {
-		response = await fetch(SITEVERIFY_URL, {
+		response = await fetchImpl(SITEVERIFY_URL, {
 			method: "POST",
 			body,
 			signal: AbortSignal.timeout(5000),

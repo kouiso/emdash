@@ -1,5 +1,3 @@
-import { env } from "cloudflare:workers";
-
 /** プライバシーポリシーの版。同意した版を登録ごとに保存する。ポリシーを変えたら更新する */
 export const PRIVACY_POLICY_VERSION = "2026-10-31";
 
@@ -14,11 +12,22 @@ const CREATE_TABLE_SQL = `CREATE TABLE IF NOT EXISTS newsletter_subscribers (
 
 export type SubscribeOutcome = "created" | "already_subscribed";
 
+/** D1Database のうち、ここで使う部分だけ。テストでは node:sqlite で同じ形を作る */
+export interface SubscriberDatabase {
+	prepare(query: string): {
+		bind(...values: unknown[]): { run(): Promise<{ meta: { changes: number } }> };
+		run(): Promise<unknown>;
+	};
+}
+
 /**
  * 同じアドレスの2回目以降は何も変えずに already_subscribed を返す（最初の同意日時を残す）。
  */
-export async function saveSubscriber(email: string, now: Date = new Date()): Promise<SubscribeOutcome> {
-	const db = env.DB;
+export async function saveSubscriber(
+	db: SubscriberDatabase,
+	email: string,
+	now: Date = new Date(),
+): Promise<SubscribeOutcome> {
 	const timestamp = now.toISOString();
 	await db.prepare(CREATE_TABLE_SQL).run();
 	const result = await db

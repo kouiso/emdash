@@ -1,73 +1,11 @@
+import { env } from "cloudflare:workers";
 import type { APIRoute } from "astro";
-import { SUBSCRIBE_HTTP_STATUS, SUBSCRIBE_MESSAGES, type SubscribeStatus } from "../../utils/subscribe-messages";
-import { normalizeEmail } from "../../utils/email";
-import { saveSubscriber } from "../../utils/subscribers";
-import { getTurnstileMode, verifyTurnstileToken } from "../../utils/turnstile";
+import { handleSubscribe } from "../../utils/subscribe-handler";
 
 export const prerender = false;
 
-/**
- * JS からの fetch（Accept: application/json）には JSON を返し、
- * JS が動かない環境の通常のフォーム送信にはトップの #gift へ 303 で戻す。
- * 登録済みのアドレスでも同じ成功応答にして、登録の有無が外から分からないようにする。
- */
-export const POST: APIRoute = async ({ request }) => {
-	const wantsJson = (request.headers.get("accept") ?? "").includes("application/json");
-	const respond = (code: SubscribeStatus): Response => {
-		const status = code === "ok" ? 200 : SUBSCRIBE_HTTP_STATUS[code];
-		if (wantsJson) {
-			return Response.json(
-				code === "ok" ? { ok: true, message: SUBSCRIBE_MESSAGES.ok } : { ok: false, error: code, message: SUBSCRIBE_MESSAGES[code] },
-				{ status, headers: { "Cache-Control": "no-store" } },
-			);
-		}
-		const location = new URL("/", request.url);
-		location.searchParams.set("subscribe", code);
-		location.hash = "gift";
-		return new Response(null, {
-			status: 303,
-			headers: { Location: location.pathname + location.search + location.hash, "Cache-Control": "no-store" },
-		});
-	};
-
-	// 別サイトに置いたフォームから他人のアドレスを登録させないよう、ブラウザが付ける Origin を確かめる。
-	// このプロジェクトの設定では Astro の checkOrigin がこのルートの別オリジン POST を止めなかった（2026-10-31 実測）
-	const origin = request.headers.get("origin");
-	if (origin !== null && origin !== new URL(request.url).origin) {
-		return Response.json({ ok: false, error: "forbidden" }, { status: 403, headers: { "Cache-Control": "no-store" } });
-	}
-
-	let form: FormData;
-	try {
-		form = await request.formData();
-	} catch {
-		return respond("invalid_request");
-	}
-
-	const email = normalizeEmail(form.get("email"));
-	if (!email) return respond("invalid_email");
-	if (form.get("consent") !== "yes") return respond("consent_required");
-
-	const turnstile = getTurnstileMode();
-	if (turnstile.kind === "misconfigured") {
-		console.error(`[subscribe] Turnstile is half configured: ${turnstile.missing} is not set`);
-		return respond("unavailable");
-	}
-	if (turnstile.kind === "enabled") {
-		const token = form.get("cf-turnstile-response");
-		const result = await verifyTurnstileToken(turnstile.secret, typeof token === "string" ? token : null);
-		if (!result.ok) return respond(result.reason === "unavailable" ? "captcha_unavailable" : "captcha_failed");
-	}
-
-	try {
-		await saveSubscriber(email);
-	} catch (error) {
-		console.error("[subscribe] failed to save subscriber", error);
-		return respond("unavailable");
-	}
-	return respond("ok");
-};
+// 中身は src/utils/subscribe-handler.ts。D1 を引数で渡すのは、Node のテストから同じ処理を呼ぶため
+export const POST: APIRoute = ({ request }) => handleSubscribe(request, { db: env.DB });
 
 export const ALL: APIRoute = () =>
 	new Response(null, { status: 405, headers: { Allow: "POST" } });
-
