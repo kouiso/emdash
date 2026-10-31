@@ -34,38 +34,76 @@ if (Astro.cache?.enabled) {
 }
 ---
 
-<Base title={`${term.label} posts`} description={`Posts in ${term.label}`}>
-	<h1>{term.label}</h1>
+<Base title={`カテゴリ: ${term.label}`} description={`「${term.label}」カテゴリの記事の一覧です。`}>
+	<div class="container category-page">
+		<nav class="breadcrumb" aria-label="パンくず">
+			<a href="/">トップ</a> / <a href="/posts">記事一覧</a> / {term.label}
+		</nav>
+		<h1 class="page-title">{term.label}</h1>
 
-	{
-		posts.length === 0 ? (
-			<p>No posts in this category yet.</p>
-		) : (
-			<ul>
-				{posts.map((post) => (
-					<li>
-						<a href={`/posts/${post.id}`}>
+		{
+			posts.length === 0 ? (
+				<p class="empty">このカテゴリの記事はまだありません。</p>
+			) : (
+				<ul class="category-list">
+					{posts.map((post) => (
+						<li class="card category-item">
 							{post.data.featured_image && (
 								<div {...post.edit.featured_image}><Image image={post.data.featured_image} /></div>
 							)}
-							<h2 {...post.edit.title}>{post.data.title}</h2>
-						</a>
-						{post.data.excerpt && <p {...post.edit.excerpt}>{post.data.excerpt}</p>}
-					</li>
-				))}
-			</ul>
-		)
-	}
-	<nav aria-label="Pagination">
-		{cursor && <a href={`/category/${term.slug}`}>First page</a>}
-		{
-			nextCursor && (
-				<a
-					href={`/category/${term.slug}?cursor=${encodeURIComponent(nextCursor)}`}
-				>
-					Next page
-				</a>
+							<a class="category-item__title" href={`/posts/${post.id}`} {...post.edit.title}>
+								{post.data.title}
+							</a>
+							{post.data.excerpt && <p class="category-item__excerpt" {...post.edit.excerpt}>{post.data.excerpt}</p>}
+						</li>
+					))}
+				</ul>
 			)
 		}
-	</nav>
+		{
+			(cursor || nextCursor) && (
+				<nav class="pager" aria-label="ページ送り">
+					{cursor && <a href={`/category/${term.slug}`}>最初のページ</a>}
+					{nextCursor && (
+						<a href={`/category/${term.slug}?cursor=${encodeURIComponent(nextCursor)}`}>次へ</a>
+					)}
+				</nav>
+			)
+		}
+	</div>
 </Base>
+
+<style>
+	.category-page {
+		padding-top: clamp(32px, 7vw, 48px);
+		padding-bottom: clamp(48px, 9vw, 72px);
+		display: flex;
+		flex-direction: column;
+		gap: 24px;
+	}
+	.category-list {
+		margin: 0;
+		padding: 0;
+		list-style: none;
+		display: flex;
+		flex-direction: column;
+		gap: 12px;
+	}
+	.category-item {
+		padding: 20px;
+		display: flex;
+		flex-direction: column;
+		gap: 6px;
+	}
+	.category-item__title {
+		font-weight: 700;
+		font-size: 18px;
+		color: var(--text);
+		text-decoration: none;
+	}
+	.category-item__excerpt {
+		margin: 0;
+		color: var(--text-2);
+		font-size: 15px;
+	}
+</style>

@@ -1,0 +1,124 @@
+---
+import Base from "../layouts/Base.astro";
+import { formatDateJa } from "../utils/course";
+import { PRIVACY_POLICY_VERSION } from "../utils/subscribers";
+
+// 版の日付をそのまま施行日として表示する（日本時間の 0 時として解釈する）
+const effectiveDate = formatDateJa(new Date(`${PRIVACY_POLICY_VERSION}T00:00:00+09:00`));
+---
+
+<Base
+	title="プライバシーポリシー"
+	description="ai-eng-blog がメルマガ登録で受け取る情報、その使い道、保存場所、利用している外部サービス、削除の依頼方法をまとめています。"
+>
+	<div class="container privacy">
+		<article class="card privacy__body">
+			<h1 class="page-title">プライバシーポリシー</h1>
+			<p class="privacy__date">施行日 <time datetime={PRIVACY_POLICY_VERSION}>{effectiveDate}</time></p>
+			<p>
+				ai-eng-blog（以下「当サイト」）は、メルマガ登録フォームでお預かりする情報を、次のとおり扱います。
+			</p>
+
+			<h2>1. 集める情報</h2>
+			<ul>
+				<li>メールアドレス（登録フォームに入力されたもの）</li>
+				<li>登録した日時</li>
+				<li>このポリシーに同意した日時と、同意したポリシーの版（日付）</li>
+			</ul>
+			<p>
+				IP アドレス、お名前、ブラウザの情報は、当サイトのデータベースには保存しません。ただし、下の「4. 利用している外部サービス」に書いたサービスは、それぞれの仕組みの中で IP アドレスなどを処理します。
+			</p>
+
+			<h2>2. 使い道</h2>
+			<ul>
+				<li>メルマガの配信</li>
+				<li>登録特典（サンプルアプリと学習ロードマップ）のお届け</li>
+			</ul>
+			<p>これ以外の目的には使いません。第三者への販売や提供もしません。</p>
+
+			<h2>3. 保存場所</h2>
+			<p>
+				メールアドレスと日時は、Cloudflare, Inc. のデータベースサービス Cloudflare D1 に保存します。当サイトのサーバー（Cloudflare Workers）だけが読み書きします。
+			</p>
+
+			<h2>4. 利用している外部サービス</h2>
+			<dl class="privacy__services">
+				<dt>Cloudflare Turnstile</dt>
+				<dd>
+					登録フォームのボット対策に使っています。フォームを表示したときに、Cloudflare がアクセスの情報を処理して、人による操作かどうかを判定します。
+					<a href="https://www.cloudflare.com/turnstile-privacy-policy/" rel="noopener">Turnstile のプライバシーについて（Cloudflare）</a>
+				</dd>
+				<dt>Cloudflare Web Analytics</dt>
+				<dd>
+					ページの閲覧数を数えるために使っています。Cloudflare は、Cookie や localStorage を使わず、IP アドレスなどで個人を識別（フィンガープリント）しないと説明しています。
+					<a href="https://www.cloudflare.com/web-analytics/" rel="noopener">Cloudflare Web Analytics</a>
+				</dd>
+				<dt>Google Search Console</dt>
+				<dd>
+					Google 検索での表示回数やクリック数を確認するために使っています。当サイトから Google に訪問者の情報を送るものではなく、Google 検索の集計結果を当サイトの運営者が見るためのサービスです。
+					<a href="https://policies.google.com/privacy?hl=ja" rel="noopener">Google プライバシーポリシー</a>
+				</dd>
+			</dl>
+
+			<h2>5. 削除の依頼</h2>
+			<p>
+				登録したメールアドレスの削除を希望される場合は、下の連絡先まで、登録したメールアドレスを書いてご連絡ください。確認のうえ、データベースから削除し、削除したことを返信でお知らせします。メルマガの配信を始めたあとは、各メールの配信停止リンクからも停止できるようにします。
+			</p>
+
+			<h2>6. お問い合わせ先</h2>
+			<p>[連絡先]</p>
+
+			<h2>7. このポリシーの変更</h2>
+			<p>
+				内容を変えるときは、このページを更新し、施行日を改めます。変更後に登録された方には、変更後のポリシーへの同意をお願いします。
+			</p>
+
+			<p class="privacy__scope">
+				当サイトは現在、商品やサービスを販売していません。特定商取引法に基づく表記は、販売を始めるときに別のページで用意します。
+			</p>
+		</article>
+	</div>
+</Base>
+
+<style>
+	.privacy {
+		padding-top: clamp(32px, 7vw, 48px);
+		padding-bottom: clamp(48px, 9vw, 72px);
+	}
+	.privacy__body {
+		max-width: 760px;
+		margin: 0 auto;
+		padding: clamp(20px, 5vw, 40px);
+		line-height: 1.9;
+	}
+	.privacy__body h2 {
+		margin: 32px 0 8px;
+		font-size: 20px;
+		line-height: 1.5;
+	}
+	.privacy__body p,
+	.privacy__body ul {
+		margin: 0 0 12px;
+	}
+	.privacy__body ul {
+		padding-left: 20px;
+	}
+	.privacy__date {
+		color: var(--muted);
+		font-size: 14px;
+	}
+	.privacy__services dt {
+		font-weight: 700;
+		margin-top: 12px;
+	}
+	.privacy__services dd {
+		margin: 4px 0 0;
+	}
+	.privacy__body .privacy__scope {
+		margin-top: 32px;
+		padding-top: 16px;
+		border-top: 1px solid var(--line);
+		color: var(--muted);
+		font-size: 14px;
+	}
+</style>

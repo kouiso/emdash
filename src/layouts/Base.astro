@@ -1,23 +1,40 @@
 ---
-import "../styles/trial.css";
+import "../styles/theme.css";
 import { getMenuWithCacheHint, getSiteSettingsWithCacheHint } from "emdash";
 import { EmDashHead, EmDashBodyStart, EmDashBodyEnd } from "emdash/ui";
 import { createPublicPageContext } from "emdash/page";
-import LiveSearch from "emdash/ui/search";
+import { readEnv } from "../utils/env";
 import { resolveStarterSiteIdentity } from "../utils/site-identity";
+
+type PageContextInput = Parameters<typeof createPublicPageContext>[0];
 
 interface Props {
 	title: string;
 	pageTitle?: string | null;
 	description?: string | null;
 	image?: string | null;
+	/** 省略するとクエリを除いた今の URL を canonical にする */
 	canonical?: string | null;
+	/** 記事は "article" にする。EmDashHead が BlogPosting の JSON-LD と article:* を出す */
+	pageType?: "website" | "article";
+	articleMeta?: PageContextInput["articleMeta"];
+	/** 404 など検索に出さないページ。canonical を出さず noindex にする */
+	noindex?: boolean;
 	/** Pass content reference for plugin page contributions on content pages */
 	content?: { collection: string; id: string; slug?: string | null };
 }
 
-const { title, pageTitle, description, image, canonical, content } =
-	Astro.props;
+const {
+	title,
+	pageTitle,
+	description,
+	image,
+	canonical,
+	pageType = "website",
+	articleMeta,
+	noindex = false,
+	content,
+} = Astro.props;
 const [settingsResult, menuResult] = await Promise.all([
 	getSiteSettingsWithCacheHint(),
 	getMenuWithCacheHint("primary"),
@@ -36,66 +53,104 @@ const titleIncludesSiteName =
 	title.endsWith(` — ${siteTitle}`);
 const fullTitle = titleIncludesSiteName ? title : `${title} — ${siteTitle}`;
 const pageDescription = description ?? siteTagline;
-const menu = menuResult.data;
+
+// 管理画面でメニューが空のときも、デザインどおりの3項目を出す
+const fallbackNav = [
+	{ label: "入門ステップ講座", url: "/#course", target: undefined },
+	{ label: "記事一覧", url: "/posts", target: undefined },
+	{ label: "特典", url: "/#gift", target: undefined },
+];
+const navItems =
+	menuResult.data && menuResult.data.items.length > 0
+		? menuResult.data.items
+		: fallbackNav;
+const currentPath = Astro.url.pathname.replace(/\/$/, "") || "/";
+const pageCanonical = noindex
+	? null
+	: (canonical ?? new URL(currentPath, Astro.url.origin).href);
+// 計測は Cloudflare Web Analytics（Cookie を使わない無料の計測）。トークンが無い環境では出さない
+const analyticsToken = readEnv("PUBLIC_CF_ANALYTICS_TOKEN");
 
 const pageCtx = createPublicPageContext({
 	Astro,
 	kind: content ? "content" : "custom",
-	pageType: "website",
+	pageType,
 	title: fullTitle,
 	pageTitle: pageTitle ?? title,
 	description: pageDescription,
-	canonical,
+	canonical: pageCanonical,
 	image,
 	content,
 	siteName: siteTitle,
+	siteUrl: Astro.url.origin,
+	articleMeta,
 });
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang="ja">
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<title>{fullTitle}</title>
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			rel="stylesheet"
+			href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;600;700;800&family=JetBrains+Mono:wght@500&display=swap"
+		/>
+		{noindex && <meta name="robots" content="noindex" />}
 		<EmDashHead page={pageCtx} />
+		{
+			analyticsToken && (
+				<script
+					is:inline
+					type="module"
+					src="https://static.cloudflareinsights.com/beacon.min.js"
+					data-cf-beacon={JSON.stringify({ token: analyticsToken })}
+				/>
+			)
+		}
 	</head>
 	<body>
 		<EmDashBodyStart page={pageCtx} />
+		<a class="skip-link" href="#main">本文へ移動</a>
 
-		<header>
-			<nav>
-				<a href="/">
+		<header class="site-header">
+			<div class="container site-header__inner">
+				<a class="site-logo" href="/">
 					{
 						siteLogo ? (
-							<img
-								src={siteLogo.url}
-								alt={siteLogo.alt || siteTitle}
-								style="height:48px;width:auto;margin:-8px 0;display:block;"
-							/>
+							<img src={siteLogo.url} alt={siteLogo.alt || siteTitle} />
 						) : (
 							siteTitle
 						)
 					}
 				</a>
-				{
-					menu?.items.map((item) => (
-						<a
-							href={item.url}
-							target={item.target}
-							rel={item.target === "_blank" ? "noopener noreferrer" : undefined}
-						>
-							{item.label}
-						</a>
-					))
-				}
-				<LiveSearch placeholder="Search..." collections={["posts", "pages"]} />
-			</nav>
+				<nav class="site-nav" aria-label="メイン">
+					{
+						navItems.map((item) => (
+							<a
+								href={item.url}
+								target={item.target}
+								rel={item.target === "_blank" ? "noopener noreferrer" : undefined}
+								aria-current={item.url === currentPath ? "page" : undefined}
+							>
+								{item.label}
+							</a>
+						))
+					}
+				</nav>
+			</div>
 		</header>
 
-		<main>
+		<main id="main">
 			<slot />
 		</main>
+
+		<footer class="site-footer">
+			{siteTitle} ・ <a href="/privacy">プライバシーポリシー</a> ・ 記事は AI 支援で執筆しています
+		</footer>
 
 		<EmDashBodyEnd page={pageCtx} />
 	</body>

@@ -4,8 +4,8 @@ import {
 	getEmDashCollection,
 	decodeSlug,
 } from "emdash";
-import { Image } from "emdash/ui";
 import Base from "../../layouts/Base.astro";
+import { findCourseStep } from "../../utils/course";
 
 const slug = decodeSlug(Astro.params.slug);
 const termsResult = await getTaxonomyTermsWithCacheHint("tag", {
@@ -17,14 +17,16 @@ if (!term) {
 	return Astro.rewrite("/404");
 }
 
+const course = findCourseStep(term.slug);
 const cursor = Astro.url.searchParams.get("cursor") || undefined;
+// 講座のタグは「上から順に読む」ので古い順、それ以外は新しい順
 const {
 	entries: posts,
 	cacheHint,
 	nextCursor,
 } = await getEmDashCollection("posts", {
 	where: { tag: term.slug },
-	orderBy: { published_at: "desc" },
+	orderBy: { published_at: course ? "asc" : "desc" },
 	limit: 20,
 	cursor,
 });
@@ -32,41 +34,137 @@ if (Astro.cache?.enabled) {
 	Astro.cache.set(termsResult.cacheHint);
 	Astro.cache.set(cacheHint);
 }
+const showNumbers = Boolean(course) && !cursor;
 ---
 
 <Base
-	title={`Posts tagged "${term.label}"`}
-	description={`Posts tagged ${term.label}`}
+	title={course ? `${term.label}（入門ステップ講座 ${course.step.no}）` : `タグ: ${term.label}`}
+	description={course ? course.step.lead : `「${term.label}」のタグが付いた記事の一覧です。`}
 >
-	<h1>Tag: {term.label}</h1>
+	<div class="container tag-page">
+		<nav class="breadcrumb" aria-label="パンくず">
+			<a href="/">トップ</a> / <a href="/posts">記事一覧</a> / {term.label}
+		</nav>
+		<div class="tag-head">
+			{course && <p class="eyebrow">入門ステップ講座 {course.step.no}</p>}
+			<h1 class="page-title">{term.label}</h1>
+			<p class="lead">
+				{course ? course.step.lead : `「${term.label}」のタグが付いた記事です。`}
+			</p>
+		</div>
 
-	{
-		posts.length === 0 ? (
-			<p>No posts with this tag yet.</p>
-		) : (
-			<ul>
-				{posts.map((post) => (
-					<li>
-						<a href={`/posts/${post.id}`}>
-							{post.data.featured_image && (
-								<div {...post.edit.featured_image}><Image image={post.data.featured_image} /></div>
-							)}
-							<h2 {...post.edit.title}>{post.data.title}</h2>
-						</a>
-						{post.data.excerpt && <p {...post.edit.excerpt}>{post.data.excerpt}</p>}
-					</li>
-				))}
-			</ul>
-		)
-	}
-	<nav aria-label="Pagination">
-		{cursor && <a href={`/tag/${term.slug}`}>First page</a>}
 		{
-			nextCursor && (
-				<a href={`/tag/${term.slug}?cursor=${encodeURIComponent(nextCursor)}`}>
-					Next page
-				</a>
+			posts.length === 0 ? (
+				<p class="empty">このタグの記事はまだありません。</p>
+			) : (
+				<ol class="tag-list">
+					{posts.map((post, i) => (
+						<li class="card tag-item">
+							{showNumbers && (
+								<span class="tag-item__no mono">{String(i + 1).padStart(2, "0")}</span>
+							)}
+							<span class="tag-item__body">
+								<a class="tag-item__title" href={`/posts/${post.id}`} {...post.edit.title}>
+									{post.data.title}
+								</a>
+								{post.data.excerpt && (
+									<span class="tag-item__excerpt" {...post.edit.excerpt}>
+										{post.data.excerpt}
+									</span>
+								)}
+							</span>
+						</li>
+					))}
+				</ol>
 			)
 		}
-	</nav>
+
+		{
+			(cursor || nextCursor) && (
+				<nav class="pager" aria-label="ページ送り">
+					{cursor && <a href={`/tag/${term.slug}`}>最初のページ</a>}
+					{nextCursor && (
+						<a href={`/tag/${term.slug}?cursor=${encodeURIComponent(nextCursor)}`}>次へ</a>
+					)}
+				</nav>
+			)
+		}
+
+		{
+			course && (course.prev || course.next) && (
+				<nav class="step-nav" aria-label="講座の前後">
+					{course.prev ? (
+						<a href={`/tag/${course.prev.slug}`}>
+							<span class="label">前のステップ</span>
+							{course.prev.no} {course.prev.name}
+						</a>
+					) : (
+						<span />
+					)}
+					{course.next && (
+						<a class="is-next" href={`/tag/${course.next.slug}`}>
+							<span class="label">次のステップ</span>
+							{course.next.no} {course.next.name}
+						</a>
+					)}
+				</nav>
+			)
+		}
+	</div>
 </Base>
+
+<style>
+	.tag-page {
+		padding-top: clamp(32px, 7vw, 48px);
+		padding-bottom: clamp(48px, 9vw, 72px);
+		display: flex;
+		flex-direction: column;
+		gap: 24px;
+	}
+	.tag-head {
+		display: flex;
+		flex-direction: column;
+		gap: 10px;
+	}
+	.tag-list {
+		margin: 0;
+		padding: 0;
+		list-style: none;
+		display: flex;
+		flex-direction: column;
+		gap: 12px;
+	}
+	.tag-item {
+		padding: 20px;
+		display: flex;
+		flex-wrap: wrap;
+		gap: 16px;
+		align-items: baseline;
+	}
+	.tag-item__no {
+		color: var(--accent);
+		min-width: 32px;
+	}
+	.tag-item__body {
+		flex: 1 1 min(100%, 360px);
+		min-width: 0;
+		display: flex;
+		flex-direction: column;
+		gap: 6px;
+	}
+	.tag-item__title {
+		font-weight: 700;
+		font-size: 18px;
+		line-height: 1.5;
+		color: var(--text);
+		text-decoration: none;
+	}
+	.tag-item__title:hover {
+		color: var(--accent);
+		text-decoration: underline;
+	}
+	.tag-item__excerpt {
+		color: var(--text-2);
+		font-size: 15px;
+	}
+</style>

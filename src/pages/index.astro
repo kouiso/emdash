@@ -1,56 +1,405 @@
 ---
-import { getEmDashCollection, getSiteSettings } from "emdash";
-import { Image } from "emdash/ui";
+import { getSiteSettings } from "emdash";
 import Base from "../layouts/Base.astro";
+import { COURSE_STEPS } from "../utils/course";
 import { resolveStarterSiteIdentity } from "../utils/site-identity";
+import { SUBSCRIBE_MESSAGES, parseSubscribeStatus } from "../utils/subscribe-messages";
+import { getTurnstileSiteKey } from "../utils/turnstile";
 
-const { entries: posts, cacheHint } = await getEmDashCollection("posts", {
-	orderBy: { published_at: "desc" },
-	limit: 10,
-});
 const { siteTitle, siteTagline } = resolveStarterSiteIdentity(
 	await getSiteSettings(),
 );
-if (Astro.cache?.enabled) Astro.cache.set(cacheHint);
+// JS なしのフォーム送信は /api/subscribe から /?subscribe=<結果>#gift に戻ってくる
+const subscribeStatus = parseSubscribeStatus(Astro.url.searchParams.get("subscribe"));
+const turnstileSiteKey = getTurnstileSiteKey();
 ---
 
 <Base title={siteTitle} description={siteTagline}>
-	<section class="trial-intro">
-		<small>EMDASH · CLOUDFLARE TRIAL</small>
-		<h1>EmDash を試してみる</h1>
-		<p>記事やページの編集、画像のアップロードを試せる公開の試用サイトです。試用には架空のデータを使ってください。</p>
-		<a class="admin-link" href="/_emdash/admin">管理画面を開く</a>
+	<section class="container hero">
+		<p class="eyebrow">LLM API / RAG / AIエージェント / MCP</p>
+		<h1 class="hero__title">
+			自分のアプリに AI を組み込む。<br />API キーを取ってから、本番に出すまで。
+		</h1>
+		<p class="hero__text">
+			記事のコードは、公開前にすべて実際に動かしています。一次情報の URL と確認した日付、料金の目安も記事ごとに書いています。
+		</p>
+		<div class="hero__actions">
+			<a class="btn btn--primary" href="#check">学ぶ順番を診断する</a>
+			<a class="btn btn--outline" href="#course">講座を最初から読む</a>
+		</div>
 	</section>
-	<h1>Recent Posts</h1>
 
-	{
-		posts.length === 0 ? (
-			<p>
-				No posts yet. <a href="/_emdash/admin/content/posts/new">Create one</a>.
+	<section id="check" class="band" aria-labelledby="check-title">
+		<div class="container section">
+			<h2 id="check-title" class="section__title">いまの段階はどちらですか</h2>
+			<div class="choices" data-diagnosis>
+				<button type="button" class="choice" data-pick="new" aria-pressed="true" aria-controls="rec-new rec-pro">
+					<span class="choice__title">AI の API をまだ使ったことがない</span>
+					<span class="choice__desc">API キーの取り方から、最初の1回を呼ぶところまで</span>
+				</button>
+				<button type="button" class="choice" data-pick="pro" aria-pressed="false" aria-controls="rec-new rec-pro">
+					<span class="choice__title">一度作ったが、本番レベルにしたい</span>
+					<span class="choice__desc">評価・コスト・エラー処理を入れる</span>
+				</button>
+			</div>
+			<div aria-live="polite">
+				<p id="rec-new" class="rec rec--new" data-rec="new">
+					おすすめ: 入門ステップ講座の 1「LLM API」から順に読む。 <a href="#course">講座へ</a>
+				</p>
+				<p id="rec-pro" class="rec rec--pro" data-rec="pro" hidden>
+					おすすめ: 6「LLM 評価」と応用記事、特典のサンプルアプリ。 <a href="#gift">特典へ</a>
+				</p>
+			</div>
+		</div>
+	</section>
+
+	<section id="gift" class="container section gift" aria-labelledby="gift-title">
+		<div class="gift__body">
+			<h2 id="gift-title" class="section__title">メルマガ登録特典</h2>
+			<p class="gift__text">
+				実際に動く TypeScript のサンプルアプリ2つと、学習ロードマップをお送りします。
 			</p>
-		) : (
-			<ul>
-				{posts.map((post) => (
-					<li>
-						<a href={`/posts/${post.id}`}>
-							{post.data.featured_image && (
-								<div {...post.edit.featured_image}><Image image={post.data.featured_image} /></div>
-							)}
-							<h2 {...post.edit.title}>{post.data.title}</h2>
-						</a>
-						{post.data.excerpt && <p {...post.edit.excerpt}>{post.data.excerpt}</p>}
-						{post.data.publishedAt && (
-							<time datetime={post.data.publishedAt.toISOString()}>
-								{post.data.publishedAt.toLocaleDateString("en-US", {
-									year: "numeric",
-									month: "long",
-									day: "numeric",
-								})}
-							</time>
-						)}
-					</li>
-				))}
+			<ul class="gift__list">
+				<li>RAG チャット（検索して答えるチャット）</li>
+				<li>自作 MCP サーバー</li>
+				<li>学習ロードマップ</li>
 			</ul>
-		)
-	}
+		</div>
+		<form class="card gift__form" method="post" action="/api/subscribe" data-subscribe-form>
+			<label for="email" class="gift__label">メールアドレス</label>
+			<input
+				id="email"
+				name="email"
+				type="email"
+				required
+				maxlength="254"
+				autocomplete="email"
+				placeholder="you@example.com"
+				class="gift__input"
+			/>
+			<label class="gift__consent">
+				<input type="checkbox" name="consent" value="yes" required />
+				<span><a href="/privacy">プライバシーポリシー</a>に同意して登録する</span>
+			</label>
+			{turnstileSiteKey && <div class="cf-turnstile turnstile-slot" data-sitekey={turnstileSiteKey} data-language="ja" />}
+			<button type="submit" class="gift__submit">特典を受け取る</button>
+			<p
+				class:list={["gift__status", subscribeStatus && (subscribeStatus === "ok" ? "gift__status--ok" : "gift__status--error")]}
+				role="status"
+				aria-live="polite"
+				data-subscribe-status
+				hidden={!subscribeStatus}
+			>
+				{subscribeStatus ? SUBSCRIBE_MESSAGES[subscribeStatus] : ""}
+			</p>
+			<p class="gift__note">いただいたメールアドレスは、メルマガと特典のお届けにだけ使います。</p>
+		</form>
+		{
+			turnstileSiteKey && (
+				<script is:inline src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer />
+			)
+		}
+	</section>
+
+	<section id="course" class="band band--last" aria-labelledby="course-title">
+		<div class="container section section--course">
+			<h2 id="course-title" class="section__title">入門ステップ講座</h2>
+			<ol class="steps">
+				{
+					COURSE_STEPS.map((s) => (
+						<li class="step">
+							<span class="step__no mono">{s.no}</span>
+							<span class="step__body">
+								<a class="step__name" href={`/tag/${s.slug}`}>{s.name}</a>
+								<span class="step__desc">{s.desc}</span>
+							</span>
+						</li>
+					))
+				}
+			</ol>
+		</div>
+	</section>
 </Base>
+
+<script is:inline>
+	(function () {
+		var root = document.querySelector("[data-diagnosis]");
+		if (!root) return;
+		var buttons = root.querySelectorAll("[data-pick]");
+		var recs = document.querySelectorAll("[data-rec]");
+		function select(pick) {
+			buttons.forEach(function (b) {
+				b.setAttribute("aria-pressed", String(b.getAttribute("data-pick") === pick));
+			});
+			recs.forEach(function (r) {
+				r.hidden = r.getAttribute("data-rec") !== pick;
+			});
+		}
+		buttons.forEach(function (b) {
+			b.addEventListener("click", function () {
+				select(b.getAttribute("data-pick"));
+			});
+		});
+	})();
+</script>
+
+<script is:inline>
+	(function () {
+		var form = document.querySelector("[data-subscribe-form]");
+		if (!form || !window.fetch || !window.FormData) return;
+		var status = form.querySelector("[data-subscribe-status]");
+		var button = form.querySelector("button[type=submit]");
+		function show(ok, message) {
+			status.textContent = message;
+			status.hidden = false;
+			status.classList.toggle("gift__status--ok", ok);
+			status.classList.toggle("gift__status--error", !ok);
+		}
+		form.addEventListener("submit", function (event) {
+			event.preventDefault();
+			button.disabled = true;
+			fetch(form.action, {
+				method: "POST",
+				body: new FormData(form),
+				headers: { Accept: "application/json" },
+			})
+				.then(function (res) {
+					return res.json();
+				})
+				.then(function (data) {
+					show(Boolean(data.ok), String(data.message || ""));
+					if (data.ok) form.reset();
+				})
+				.catch(function () {
+					show(false, "送信できませんでした。通信状態を確認して、もう一度お試しください。");
+				})
+				.finally(function () {
+					button.disabled = false;
+					// Turnstile のトークンは1回しか使えないので、結果にかかわらず取り直す
+					if (window.turnstile && typeof window.turnstile.reset === "function") window.turnstile.reset();
+				});
+		});
+	})();
+</script>
+
+<style>
+	.hero {
+		padding-top: clamp(40px, 9vw, 72px);
+		padding-bottom: clamp(40px, 7vw, 56px);
+		display: flex;
+		flex-direction: column;
+		gap: 20px;
+	}
+	.hero__title {
+		margin: 0;
+		font-size: clamp(28px, 6.4vw, 44px);
+		line-height: 1.35;
+		font-weight: 800;
+		max-width: 780px;
+	}
+	.hero__text {
+		margin: 0;
+		font-size: clamp(16px, 2.4vw, 18px);
+		line-height: 1.8;
+		max-width: 680px;
+		color: var(--text-2);
+	}
+	.hero__actions {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 12px;
+		margin-top: 8px;
+	}
+	.band {
+		background: var(--surface);
+		border-top: 1px solid var(--line);
+		border-bottom: 1px solid var(--line);
+	}
+	.band--last {
+		border-bottom: 0;
+	}
+	.section {
+		padding-top: clamp(40px, 7vw, 56px);
+		padding-bottom: clamp(40px, 7vw, 56px);
+		display: flex;
+		flex-direction: column;
+		gap: 20px;
+	}
+	.section--course {
+		padding-bottom: clamp(48px, 9vw, 72px);
+	}
+	.section__title {
+		margin: 0;
+		font-size: clamp(22px, 4.6vw, 28px);
+		line-height: 1.4;
+	}
+	.choices {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+		gap: 16px;
+	}
+	.choice {
+		text-align: left;
+		padding: 24px;
+		border-radius: 12px;
+		border: 1px solid var(--line);
+		background: var(--surface);
+		font: inherit;
+		color: inherit;
+		cursor: pointer;
+		min-height: 44px;
+	}
+	.choice[aria-pressed="true"] {
+		border: 2px solid var(--accent);
+		padding: 23px;
+	}
+	.choice__title {
+		display: block;
+		font-size: 19px;
+		font-weight: 700;
+		line-height: 1.5;
+	}
+	.choice__desc {
+		display: block;
+		margin-top: 8px;
+		color: var(--text-2);
+		line-height: 1.7;
+	}
+	.rec {
+		margin: 0;
+		padding: 16px 20px;
+		border-radius: 8px;
+		line-height: 1.7;
+	}
+	.rec--new {
+		background: var(--accent-soft);
+	}
+	.rec--pro {
+		background: var(--warm-soft);
+	}
+	.gift {
+		flex-direction: row;
+		flex-wrap: wrap;
+		gap: 32px;
+		align-items: flex-start;
+	}
+	.gift__body {
+		flex: 1 1 420px;
+		min-width: 0;
+		display: flex;
+		flex-direction: column;
+		gap: 12px;
+	}
+	.gift__text {
+		margin: 0;
+		line-height: 1.8;
+		color: var(--text-2);
+	}
+	.gift__list {
+		margin: 0;
+		padding-left: 20px;
+		line-height: 2;
+	}
+	.gift__form {
+		flex: 1 1 360px;
+		min-width: 0;
+		padding: 24px;
+		display: flex;
+		flex-direction: column;
+		gap: 12px;
+	}
+	.gift__label {
+		font-weight: 600;
+	}
+	.gift__input {
+		padding: 12px;
+		font: inherit;
+		border: 1px solid var(--input-line);
+		border-radius: 8px;
+		min-height: 44px;
+		width: 100%;
+	}
+	.gift__consent {
+		display: flex;
+		align-items: flex-start;
+		gap: 8px;
+		font-size: 14px;
+		line-height: 1.6;
+	}
+	.gift__consent input {
+		width: 20px;
+		height: 20px;
+		margin: 2px 0 0;
+		flex: none;
+	}
+	.turnstile-slot {
+		min-height: 65px;
+	}
+	.gift__status {
+		margin: 0;
+		font-size: 14px;
+		line-height: 1.6;
+	}
+	.gift__status--ok {
+		color: var(--text);
+		font-weight: 600;
+	}
+	.gift__status--error {
+		color: #b42318;
+		font-weight: 600;
+	}
+	.gift__submit {
+		padding: 14px;
+		background: var(--warm);
+		color: #ffffff;
+		border: 0;
+		border-radius: 8px;
+		font: inherit;
+		font-weight: 700;
+		cursor: pointer;
+		min-height: 44px;
+	}
+	.gift__submit:hover {
+		filter: brightness(0.92);
+	}
+	.gift__note {
+		margin: 0;
+		font-size: 13px;
+		color: var(--muted);
+	}
+	.steps {
+		margin: 0;
+		padding: 0;
+		list-style: none;
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
+		gap: 16px;
+	}
+	.step {
+		border: 1px solid var(--line);
+		border-radius: 12px;
+		padding: 20px;
+		display: flex;
+		gap: 16px;
+		align-items: flex-start;
+	}
+	.step__no {
+		font-size: 22px;
+		color: var(--accent);
+		min-width: 32px;
+		line-height: 1.4;
+	}
+	.step__body {
+		display: flex;
+		flex-direction: column;
+		gap: 6px;
+	}
+	.step__name {
+		font-weight: 700;
+		font-size: 18px;
+	}
+	.step__desc {
+		color: var(--text-2);
+		line-height: 1.7;
+	}
+</style>

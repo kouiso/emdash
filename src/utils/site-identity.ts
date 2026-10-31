@@ -12,8 +12,8 @@ export interface StarterSiteIdentitySettings {
 	favicon?: MediaReference;
 }
 
-const DEFAULT_SITE_TITLE = "My Site";
-const DEFAULT_SITE_TAGLINE = "Built with EmDash";
+const DEFAULT_SITE_TITLE = "ai-eng-blog";
+const DEFAULT_SITE_TAGLINE = "自分のアプリに AI を組み込む開発を、実際に動かしたコードで学ぶブログ";
 
 export function resolveStarterSiteIdentity(settings?: StarterSiteIdentitySettings) {
 	return {

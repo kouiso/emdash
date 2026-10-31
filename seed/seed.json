@@ -7,8 +7,8 @@
 		"author": "EmDash"
 	},
 	"settings": {
-		"title": "My Site",
-		"tagline": "Built with EmDash"
+		"title": "ai-eng-blog",
+		"tagline": "自分のアプリに AI を組み込む開発を、実際に動かしたコードで学ぶブログ"
 	},
 	"collections": [
 		{
@@ -98,6 +98,30 @@
 				{
 					"slug": "example",
 					"label": "Example"
+				},
+				{
+					"slug": "llm-api",
+					"label": "LLM API"
+				},
+				{
+					"slug": "structured-output",
+					"label": "構造化出力"
+				},
+				{
+					"slug": "rag",
+					"label": "RAG"
+				},
+				{
+					"slug": "ai-agent",
+					"label": "AIエージェント"
+				},
+				{
+					"slug": "mcp-server",
+					"label": "MCPサーバー"
+				},
+				{
+					"slug": "llm-eval",
+					"label": "LLM 評価"
 				}
 			]
 		}
@@ -109,18 +133,18 @@
 			"items": [
 				{
 					"type": "custom",
-					"label": "Home",
-					"url": "/"
+					"label": "入門ステップ講座",
+					"url": "/#course"
 				},
 				{
 					"type": "custom",
-					"label": "Posts",
+					"label": "記事一覧",
 					"url": "/posts"
 				},
 				{
 					"type": "custom",
-					"label": "About",
-					"url": "/about"
+					"label": "特典",
+					"url": "/#gift"
 				}
 			]
 		}
