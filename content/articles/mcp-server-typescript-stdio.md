@@ -1,5 +1,5 @@
 ---
-title: "MCPサーバーを TypeScript で自作する手順【SDK v1.32.2、Claude Code に接続まで】"
+title: "MCP サーバーを TypeScript で自作する手順【SDK v1.32.2、Claude Code に接続まで】"
 slug: "mcp-server-typescript-stdio"
 description: "公式 SDK v1.32.2 で、文字数を数えるツールを1つ持つ MCP サーバーを TypeScript で作ります。SDK のクライアントで結果を確かめ、Claude Code に登録して接続するまでを実際の出力付きで書いています。"
 tags: ["MCPサーバー", "TypeScript", "Claude Code"]
@@ -51,6 +51,9 @@ sources:
   - url: "https://github.com/modelcontextprotocol/typescript-sdk/blob/v1.x/src/server/mcp.ts"
     title: "typescript-sdk v1.x src/server/mcp.ts"
     accessed: 2026-10-31
+  - url: "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/length"
+    title: "String: length (MDN)"
+    accessed: 2026-10-31
 cost_estimate: "記事の手順は LLM の API を呼ばないので無料です。Claude にツールを呼ばせるには、Claude Code を使える有料のアカウントが要ります。"
 run_environment: "Node.js 22.22.0、SDK 1.32.2、Claude Code 2.1.314"
 verified_at: "2026-10-31"
@@ -79,7 +82,7 @@ MCP サーバーは、LLM（大規模言語モデル）が呼べるツールを�
 
 この記事のサーバーが公開するツールは、`count_chars` の1つです。文章を受け取り、文字数、行数、UTF-8 のバイト数の3つを1行の文字列で返します。
 
-stdio 方式では、クライアントがサーバーを子プロセスとして起動します（出典3）。この記事でのクライアントは、SDK で書く確認用のプログラムと Claude Code の2つです。やり取りは標準入出力を通る JSON-RPC です（出典3）。サーバー側で HTTP のポートを開ける必要はありません。
+stdio 方式では、クライアントがサーバーを子プロセスとして起動します（出典3）。この記事でのクライアントは、SDK で書く確認用のプログラムと Claude Code の2つです。やり取りは標準入出力を通る JSON-RPC です（出典3）。
 
 ## 前提となる環境
 
@@ -252,7 +255,7 @@ code points: 5
 graphemes: 1
 ```
 
-`length` は UTF-16 の単位で数えるので、8になります。コードポイント単位で数えても5です。`Intl.Segmenter` に `"grapheme"` を渡すと、見た目の1文字ごとに区切ります（出典12）。`count_chars` はこの数え方なので、家族の絵文字を1文字と返します。
+`length` は UTF-16 の単位で数えるので、8になります（出典15）。コードポイント単位で数えても5です。`Intl.Segmenter` に `"grapheme"` を渡すと、見た目の1文字ごとに区切ります（出典12）。`count_chars` はこの数え方なので、家族の絵文字を1文字と返します。
 
 ## 3. SDK のクライアントから呼ぶと入力エラーも結果で返る
 
@@ -418,5 +421,6 @@ npm run check
 | 12 | Intl.Segmenter() constructor（MDN） | https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/Segmenter/Segmenter | 2026-10-31 |
 | 13 | Node.js Modules: ECMAScript modules | https://nodejs.org/api/esm.html | 2026-10-31 |
 | 14 | typescript-sdk v1.x src/server/mcp.ts | https://github.com/modelcontextprotocol/typescript-sdk/blob/v1.x/src/server/mcp.ts | 2026-10-31 |
+| 15 | String: length（MDN） | https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/length | 2026-10-31 |
 
 AI 支援で執筆しました。コードは 2026-10-31 に実際に実行して確認しています。
