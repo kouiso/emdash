@@ -18,6 +18,14 @@
 		},
 	],
 	"workers_dev": true,
+	"vars": {
+		// 要置き換え: 本番の公開 URL（例 https://ai-eng-blog.<アカウントのサブドメイン>.workers.dev）。
+		// 本番の管理画面で最初の管理者を作る「前」に、実際の URL に書き換えてコミットする。
+		// URL の形でない値のあいだ EmDash はこの変数を使わず、開いたアドレスをそのまま使う
+		// （2026-10-31 にローカルで確認）。理由と手順は docs/decisions/site-url.md。
+		// ダッシュボードで設定しても、次の wrangler deploy でこの値に上書きされる。
+		"EMDASH_SITE_URL": "REPLACE_WITH_WORKERS_DEV_URL",
+	},
 	"kv_namespaces": [
 		{ "binding": "SESSION", "id": "12fbffdd4ec5416999785817007ee354" }
 	],
