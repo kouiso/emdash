@@ -48,7 +48,7 @@ EmDash 自体の書き方（サーバーレンダリング必須、画像フィ�
 - 断定には一次情報の URL と確認した日付を付けます。既存の記事とテーマが重なる記事は書きません。
 - 記事の末尾に「AI 支援で執筆」と入れます。公開後に誤りが見つかったら、リビジョンで戻すか下書きに戻します。直すときはスキルを通し、原稿と EmDash の両方を更新します。
 
-30本の進め方は次のとおりです。最初の1本をパイロットとして最後まで通し、結果をユーザーに報告してから残り29本に進みます。残りはサブエージェントが1本ずつ `content/articles/` と `logs/` まで書き、MCP での投稿はメインエージェントがまとめて行います。公開は1日1本の予約公開です。EmDash の MCP で予約公開ができるかどうかは、まだ確かめていません（実装時にドキュメントで確認する）。できなければ Claude Code の scheduled task で毎日1本公開します。通った本数と落ちた本数は数えて報告します。
+30本の進め方は次のとおりです。最初の1本をパイロットとして最後まで通し、結果をユーザーに報告してから残り29本に進みます。残りはサブエージェントが1本ずつ `content/articles/` と `logs/` まで書き、MCP での投稿はメインエージェントがまとめて行います。公開は1日1本の予約公開です。EmDash の MCP の `content_schedule` で予約でき、予約時刻を過ぎた記事は Cron Trigger の scheduled handler が公開することを、ローカルで確かめました（[docs/verification/local-mcp.md](./docs/verification/local-mcp.md)、2026-10-31）。本番の Cron Trigger が動くことは deploy のあとに確かめます（[docs/verification/post-deploy.md](./docs/verification/post-deploy.md)）。本番で Cron Trigger が動かないとわかった場合だけ、Claude Code の scheduled task で毎日1本公開します。通った本数と落ちた本数は数えて報告します。
 
 ## サイトと Cloudflare のルール
 
@@ -65,4 +65,4 @@ EmDash 自体の書き方（サーバーレンダリング必須、画像フィ�
 - Turnstile のシークレットキーは、Worker の secret としてユーザーが Cloudflare のダッシュボードで登録します。リポジトリにも、`.dev.vars` の中身としてのコミットにも入れません。
 - Search Console のデータを読むための認証も、手でトークンを作って渡す方法は使いません。ユーザーがログインして許可する方法（コネクタの OAuth など）にします。具体的な方法は「実装時にドキュメントで確認する」項目です。
 - `.env`、`.dev.vars`、`.wrangler/` は `.gitignore` で除外済みです。秘密を書くファイルを増やしたら、同じコミットで `.gitignore` にも足します。
-- push の前に GitHub の secret scanning（`run_secret_scanning`）をかけ、検出0件を確かめます。
+- push の前に、変更したファイルを正規表現で調べるローカルのスキャン `npm run secret-scan`（`scripts/secret-scan.mjs`。追跡しているリモートのブランチとの差分と、まだコミットしていない変更を調べる）をかけ、検出0件を確かめます。このリポジトリでは GitHub Advanced Security が有効でないので、GitHub の secret scanning（`run_secret_scanning`）は使えません。

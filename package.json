@@ -13,7 +13,8 @@
     "deploy": "npm run build && wrangler deploy",
     "typecheck": "astro check",
     "cf:types": "wrangler types",
-    "test": "vitest run"
+    "test": "vitest run",
+    "secret-scan": "node scripts/secret-scan.mjs"
   },
   "dependencies": {
     "@astrojs/cloudflare": "14.3.1",
